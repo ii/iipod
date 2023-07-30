@@ -14,7 +14,7 @@ ssh -A ii@sharing.io
 #+end_src
 ** ensure current version
 #+begin_src tmux
-cd ~/space-templates && git pull
+cd ~/iipod && git pull
 #+end_src
 ** optionally login to docker registry
 #+begin_src tmux
@@ -22,14 +22,14 @@ docker login ghcr.io -u hh --password-stdin
 #+end_src
 ** build the image
 #+begin_src tmux
-cd ~/space-templates/iipod/build
-export IMAGE=ghcr.io/cloudnative-coop/iipod:2023.07.26-03
+cd ~/iipod/build
+export IMAGE=ghcr.io/ii/iipod:2023.07.31-01
 docker build -t $IMAGE .  && docker push $IMAGE
 #+end_src
 ** Be sure and update your DEFAULT_CONTAINER_IMAGE
 in .envrc
 #+begin_src shell
-export DEFAULT_CONTAINER_IMAGE="ghcr.io/cloudnative-coop/iipod:2023.07.26-XX"
+export DEFAULT_CONTAINER_IMAGE="ghcr.io/ii/iipod:2023.07.31-01"
 #+end_src
 * .envrc
 #+begin_src shell
@@ -46,10 +46,15 @@ export DNS_UPDATE_SERVER="123.253.176.253" # DNS Server to connect to
 export DNS_UPDATE_KEYNAME="cloudnative.nz." # TSIG Key Name
 export DNS_UPDATE_KEYALGORITHM="hmac-sha256" # TSIG Key Algorithm
 export DNS_UPDATE_KEYSECRET=BASE64_TSIG_RFC2136
-# The rest of these are for the defaults for the template
+# The rest of these are for the defaults for the template default vars and workspace rich-params
 export DEFAULT_GIT_URL="https://github.com/cloudnative-nz/infra"
 export DEFAULT_ORG_URL="https://raw.githubusercontent.com/cloudnative-nz/infrasnoop/canon/org/demo.org"
-export DEFAULT_CONTAINER_IMAGE="ghcr.io/cloudnative-coop/iipod:2023.07.26-02"
+export DEFAULT_CONTAINER_IMAGE="ghcr.io/ii/iipod:2023.07.31-01"
+# For when we create/push a template, to push a .terraform.lock
+export TF_VERSION=1.5.4
+# For when we instanciate a template, the name and how long to keep it up
+export CODER_TEMPLATE_NAME=iipod
+export CODER_WORKSPACE_STOP_AFTER=7d
 #+end_src
 * terraform
 :PROPERTIES:
@@ -64,12 +69,10 @@ ssh -A ii@sharing.io
 #+begin_src tmux
 curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh | sudo bash
 #+end_src
-*** ensure terraform version is 1.3.9
-
-I am noting that terraform has a newer version at 1.4.2!
+*** ensure terraform version is 1.5.4
 
 #+begin_src tmux
-export TF_VERSION=1.3.9
+export TF_VERSION=1.5.4
 tfswitch
 #+end_src
 ** check terraform
@@ -103,7 +106,7 @@ ssh -A ii@sharing.io
 #+end_src
 ** cd to iipod folder
 #+begin_src tmux
-cd ~/space-templates/iipod
+cd ~/iipod
 #+end_src
 ** init terraform
 coder now supports speeding things up if you `terraform init` so .terraform.lock.hcl is pushed the template and cached.
@@ -120,7 +123,8 @@ terraform init
 #+end_src
 ** push/create the template with terraform vars
 #+begin_src tmux
-cd ~/space-templates
+export CODER_CONFIG_DIR=~/.config/space.cloudnative.nz
+cd ~/iipod
 coder template push --create \
     --yes \
     --directory ~/space-templates/iipod \
@@ -144,6 +148,26 @@ coder template push --create \
     iipod
 #+end_src
 * workspace
+** cd to iipod folder
+#+begin_src tmux
+cd ~/iipod
+#+end_src
+** cd to iipod folder
+#+begin_src bash
+cd ~/iipod
+. .envrc
+env | grep "CODER" | grep SSH\\\|WORKSPACE\\\|TEMPLATE | sort
+# env | grep "CODER_RICH\\\|CODER_SSH\\\|CODER_WORKSPACE\\\|CODER_TEMPLATE"
+#+end_src
+
+#+RESULTS:
+| CODER_SSH_FORWARD_AGENT=true  |
+| CODER_SSH_FORWARD_GPG=true    |
+| CODER_SSH_NO_WAIT=true        |
+| CODER_SSH_WAIT=no             |
+| CODER_TEMPLATE_NAME=iipod     |
+| CODER_WORKSPACE_STOP_AFTER=7d |
+
 ** coder create with parameters
 #+begin_src tmux
 export CODER_RICH_PARAMETER_FILE=$(mktemp)
@@ -154,5 +178,5 @@ container-image: $DEFAULT_CONTAINER_IMAGE
 git-url: $DEFAULT_GIT_URL
 org-url: $DEFAULT_ORG_URL
 EOF
-coder create --yes wed1247
+coder create --yes sun1009
 #+end_src
