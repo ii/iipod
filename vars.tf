@@ -14,7 +14,7 @@ data "coder_workspace" "ii" {
 # And deployed with coder template push --variables-file ./vars/space.sharing.io.yaml or similar
 
 locals {
-  username          = data.coder_workspace.ii.owner
+  username          = lower(data.coder_workspace.ii.owner)
   namespace         = lower(data.coder_workspace.ii.owner)
   spacename         = lower(data.coder_workspace.ii.name)
   user_domain       = "${local.namespace}.${var.coder_domain}"
