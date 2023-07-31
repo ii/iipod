@@ -1,0 +1,417 @@
+#+title: 04 Copy Paste
+
+* The ticket
+#+begin_quote
+In our iipod, we offer a noVNC desktop environment that, by default, does not have the most intuitive copy and paste functionality. There is an in-progress branch of noVNC that brings in better copy-paste support.
+
+In this ticket, establish how copy and paste currently works in noVNC, bring in the work of the copy/paste branch, and establish how copy and paste works after bringing in that work.
+
+Ideally, there is functionality within our NoVNC service to copy test within that remote environment and paste it in your local environment, and this functionality works across browsers. If that is not easily possible, then let us at least establish what is currently possible and the work required to get that functionality.
+#+end_quote
+- [[https://github.com/ii/iipod/issues/4][gh issue]]
+* Terminology
+For the most part, when I use any of these terms in the doc I am referring to ther below, work-specific definition:
+
+- iipod :: a workspace on https://space.cloudnative.nz that was created from a template in this repo's ~iipod~ directory.
+- noVNC, or noVNC service :: the remote desktop environment on iipod deployed with the [noVNC code](https://github.com/novnc/noVNC)
+- copy/paste :: To copy means, specifically, to copy text written in the remote noVNC service and then pasting the text in your local environment.
+                To paste means, specifically, copying text in your local environment and being able to paste it into the noVNC service.
+* The work
+The goal in this work is to:
+- establish the existing copy and paste functionality for iipod's noVNC service
+- bring in work from [[https://github.com/juanjoDiaz/noVNC/tree/add_clipboard_support][juanjoDiaz' noVNC fork]]
+- test copy/paste functionality again, with this fork included.
+- Set expectations for the level of functionality we have, the level we want,
+  the degree of work to get it, and whether the work is currently worth it.
+* Establish existing functionality
+To start, I created an iiPod with the existing code in this repo, at commit
+~8a8937e~, using ~ghcr.io/ii/iipod:2023.07.31-01~ as the default image.  See footnotes for procedure to create new templates.
+** Copy and paste using noVNC method
+There is a built in clipboard for noVNC already, found in its side menu bar.
+This is not "intuitive" (e.g. following how we expect copy and paste to work).
+
+To use it, you select text anywhere in novnc, and that selected text populates
+the clipboard portion of the side menu. If you then select the text from within
+this cipboard menu and hit (ctrl/cmd)-c, it will copy it to your local clipboard
+for you to paste anywhere locally.
+
+Similarly, you can paste text from your local clipboard into this clipboard
+menu, then select it and hit (ctrl/cmd)-c and paste it anywhere in vnc.
+
+This works when logged into the noVnc session in either Firefox or Chrome. It is
+not what we are testing, though. We are testing the ability to copy and paste
+without this middle agent.
+
+** Testing expected functionality
+For testing, we will try to do copy(remote)/paste(local) in these apps in our novNC service(https://vnc--iipod--zz-test1--zachmandeville.cloudnative.nz/?autoconnect=true&resize=remote):
+- firefox
+- vscode
+- terminal
+- emacs
+
+For each application, we will use the app's native copying method.
+
+If the test does not work for firefox, it will likely not work for any of the
+others and they do not need to be tested. If it does work for firefox, we'll try
+the next app.
+
+
+For each test, we will open our NoVNC session in both firefox and chrome, testing both browsers.
+
+*** Copying from firefox
+**** Chrome
+ In our novnc, i open a new firefox tab and in address bar type `test firefox`.
+ I highlight the text with my mouse and then hit ctrl-c to copy.
+
+ in my local environment, i select a text field and hit ctrl-v. I do not get
+ ~test test~.
+
+ I try it again, this time right-clicking and selecting "copy" in the dropdown.
+
+Locally, i select a text field and right click to choose "paste". I do not get
+~test test~.
+
+Copying does not work, as we expect, in chrome.
+**** Firefox
+I run through the same test as above, with the same results. It works to copy
+and paste from within novnc, but copying from novnc and trying to paste locally
+does not work.  Similarly, copying locally and trying to paste into novnc does not work.
+* Bring in juanjodiaz changes
+Novnc is setup in the dockerfile for our iipod image, where we install it with ~sudo apt install~.  We want to, instead, pull from juanjodiaz' git repo and then copy it into /usr/share to use that code directly.
+
+So in our[[file:~/src/ii/iipod/build/Dockerfile][ build/Dockerfile]]  we comment out our install on line 77
+#+begin_example
+76    docker-ce-cli \
+77    # novnc \
+78    tigervnc-standalone-server \
+#+end_example
+
+And add a manual install after this first run command:
+
+#+begin_example
+RUN git clone --branch add_clipboard_support https://github.com/juanjoDiaz/noVNC.git /usr/share/novnc
+#+end_example
+
+We can then build and push this new image (see footnotes for method).
+
+Building the image takes quite a while, and should be  part of our github workflow.  Luckily, Stephen did this work and pushed to his local docker repository, so we can use his image for these tests.
+https://hub.docker.com/r/heyste/novnc-iipod/tags
+
+* Test new workspace
+I'll create a new ipod with all the same code, except using this update iipod
+image. The easiest way to do this, actually, is to use the existing template allowing for prompts.
+When it asks which image to use in the prompt, put in heyste's image.
+
+#+begin_src sh
+coder create --template="zzpod1" zz-test2
+#+end_src
+
+** Difference from first try
+Now when you first log into noVNC, on chrome, you will see a popup asking for access to your clipboard.  Click yes.
+
+[[file:assets/clipboard-access-popup.png][clipboard notification]]
+
+This popup /does not appear in firefox/.
+
+** Testing expected functionality
+For testing, we will try to do copy(remote)/paste(local) in these apps in our novNC service(https://vnc--iipod--zz-test1--zachmandeville.cloudnative.nz/?autoconnect=true&resize=remote):
+- firefox
+- vscode
+- terminal
+- emacs
+
+For each application, we will use the app's native copying method.
+
+If the test does not work for firefox, it will likely not work for any of the
+others and they do not need to be tested. If it does work for firefox, we'll try
+the next app.
+
+For each test, we will open our NoVNC session in both firefox and chrome, testing both browsers.
+
+** Copying from firefox :success:
+*** Chrome
+ In our novnc, i open a new firefox tab and in address bar type ~test again~.
+ I highlight the text with my mouse and then hit ctrl-c to copy.
+
+ in my local environment, i select a text field and hit ctrl-v. I get ~test again~.
+
+ I try it again, this time right-clicking and selecting "copy" in the dropdown.
+
+Locally, i select a text field and right click to choose "paste". I get ~test again~.
+
+*Copying works as expected in chrome.*
+*** Firefox
+ In our novnc, i open a new firefox tab and in address bar type ~test again test~.
+ I highlight the text with my mouse and then hit ctrl-c to copy.
+
+ in my local environment, i select a text field and hit ctrl-v. I get ~test again test~.
+
+ I try it again, this time right-clicking and selecting "copy" in the dropdown.
+
+Locally, i select a text field and right click to choose "paste". I get ~test again test~.
+
+*Copying works as expected in firefox.*
+** Copying from visual studio code :success:
+*** Chrome
+ In our novnc, i go to Applications>Development>Visual Studio Code.  When it opens, i choose file>new text file. I type ~testing vsc~.
+
+ I highlight the text with my mouse and then hit ctrl-c to copy.
+
+ in my local environment, i select a text field and hit ctrl-v. I get ~testing vnc~.
+
+ I try it again, this time right-clicking and selecting "copy" in the dropdown.
+
+Locally, i select a text field and right click to choose "paste". I get ~testing vnc~.
+*Copying works as expected in chrome.*
+*** Firefox
+I do the same steps from within firefox, with same results.
+*Copying from vsc works in firefox*.
+** Copying from kitty :success:
+*** Chrome
+ In our novnc, i navigate to the open kitty terminal. It is showing the terminal from within a tmux window.
+
+ I type ~echo hi~ into the prompt
+
+ I highlight the text with my mouse and, keeping my mouse held down, hit shift-ctrl-c to copy. If I do not keep it held down, the selection goes away.
+
+ in my local environment, i select a text field and hit ctrl-v. I get ~test again~.
+
+*Copying in kitty basically works as expected in chrome.*
+*** Firefox
+I repeat the test above and get identical results in firefox.
+*Copying works as expected in firefox.*
+** Copying from emacs :success:
+*** Chrome
+I go to Applications>Development>Emacs then hit spc ff test.txt.   I write ~testing emacs~, then hit yy to copy the entire line
+
+I navigate to a local window and do ctrl-v to paste.  I get ~testing emacs~
+
+*Copying works as expected in chrome.*
+*** Firefox
+ In our novnc, i open a new firefox tab and in address bar type ~test again test~.
+ I highlight the text with my mouse and then hit ctrl-c to copy.
+
+ in my local environment, i select a text field and hit ctrl-v. I get ~test again test~.
+
+ I try it again, this time right-clicking and selecting "copy" in the dropdown.
+
+Locally, i select a text field and right click to choose "paste". I get ~test again test~.
+
+*Copying works as expected in firefox.*
+I replicate the above experiment and get identical results
+*Copying works as expected in chrome.*
+** Pasting locally and copying to noVnc :onlychrome:
+*** Chrome
+Locally, i write ~testing local~ in a text field, select it, and hit ctrl-c to copy.
+
+I navigate to novnc and the firefox address bar and hit ctrl-v.  I get ~testing locally~.
+
+I navigate to emacs, with the open text file, and press p.  I get ~testing locally.~
+
+I navigate to kitty, and in the prompt hit shift-ctrl-v. I get ~testing locally~
+
+I navigate to vsc, and in the open text file hit ctrl-v. I get ~testing locally~.
+*Pasting works as expected in chrome.*
+
+*** Firefox
+ In our novnc, i open a new firefox tab and in address bar type ~test again test~.
+ I highlight the text with my mouse and then hit ctrl-c to copy.
+
+ in my local environment, i select a text field and hit ctrl-v. I get ~test again test~.
+
+ I try it again, this time right-clicking and selecting "copy" in the dropdown.
+
+Locally, i select a text field and right click to choose "paste". I get ~test again test~.
+
+*Copying works as expected in firefox.*
+Locally, I write ~testing local firefox~ in a text field, select it, and hit ctrl-c to copy.
+
+I navigate to novnc and fire firefox address bar and hit ctrl-v. I do not get the correct response.
+The same is true across all the other tested apps.
+
+*Pasting does not work in firefox*.
+* Conclusions
+The juanjodiaz branch, with no changes, gives us the expected copy and paste functionality in chrome.
+In firefox, copy works but paste does not.
+
+This matches juanjodiaz' pr comments. The paste does not work due to differences
+in the clipboard api. In the four years since the PR opened there has not been
+an update to it to get it to work.
+* What next? (setting expectations)
+Simply, we can either try to make adjustments to the juanjodiaz pr to add
+functionality across browsers, or say "noVNC is supported in chrome only", with
+the correct caveat.
+
+To make adjustments to the pr requires understanding the clipboard api and the
+browser standards of chrome,firefox, safari, and edge. There are too many
+browsers to accurately say "this work sin all browsers"(e.g. would it work in
+lynx or netsurf? or brave or opera?) We have to limit it to "major browsers".
+
+I do not know if this is worth our time. Differing browser api's is a complex
+issue that requires changes/cooperation across multiple places. This is new
+territory for the majority of us. The benefit will be that we can copy and
+paste, without using the middle agent, in all browsers. I think until this is a
+bellowed-for request from active users, we do not need to worry about this.
+
+Instead, we can add the caveat that copy/paste in novnc only works fully in
+chrome, other browsers should use the existing noVNC clipboard menu. Where would
+be the best place to put this? Would we want to adjust the buttons in the
+workspace, or can we add some onboarding text to that worksapce? Or would it be
+better to have a documentation page somewhere else where we can put in more
+info? Or is this something that we note here, but don't document on the page
+until it comes up again?
+
+Regardless, I think it would be good to merge the updated Dockerfile and push a
+new image with its benefit. We could add some github action workflows to create
+these images on push. That work might best be done as a short, separate ticket.
+
+* Footnotes
+** Creating iipod workspaces
+
+The simplest way I found to make a workspace is to set up the config in this tangled file, making use of env vars, and then
+include this as a variables file in our template creation
+
+This assumes the presence of a .envrc file and that you are using direnv
+
+With those two bits in place, then, you can setup a variables file.  Here's a handy tangling method.
+
+First, our src block that returns an env var, given an argument.
+
+#+NAME: getenv
+#+begin_src elisp :var env="HOME"
+(getenv env)
+#+end_src
+
+
+#+RESULTS: getenv
+: /home/zach
+
+We can then use noweb to weave that src block into our tangled file, which we will store in our .config folder
+#+NAME: Variables file
+#+begin_src yaml :noweb yes :tangle ~/.config/space.cloudnative.nz
+pdns_api_key: <<getenv("PDNS_API_KEY")>>
+pdns_api_url: "https://pdns.ii.nz"
+pdns_account: <<getenv("PDNS_ACCOUNT")>>
+dns_update_keysecret: <<getenv("DNS_UPDATE_SECRET")>>
+coder_url: "https://space.cloudnative.nz"
+coder_domain: "cloudnative.nz"
+local_ip: "123.253.178.101"
+public_ip: "123.253.178.101"
+dns_update_server: "123.253.176.253"
+dns_update_keyname: "cloudnative.nz."
+dns_update_keyalgorithm: "hmac-sha256"
+default_git_url: "https://github.com/cloudnative-nz/infra"
+default_org_url: "https://raw.githubusercontent.com/cloudnative-nz/infrasnoop/canon/org/demo.org"
+default_container_image: "ghcr.io/ii/iipod:2023.07.31-01"
+coder_workspace_stop_after: 90h
+tf_version: 1.5.4
+#+end_src
+
+And then, after tangling, you can run this command to create the template.
+
+#+begin_src sh  :dir ../.. :var templatename="zzpod3"
+coder template create -y --variables-file ~/.config/space.cloudnative.nz $templatename
+#+end_src
+
+#+RESULTS:
+| >                                                  | ⧗                           | Queued              |              |            |                                           |         |     |    |           |            |     |
+| [1A✔                                          | Queued                      | [524ms]             |              |            |                                           |         |     |    |           |            |     |
+| >                                                  | ⧗                           | Adding              | README.md... |            |                                           |         |     |    |           |            |     |
+| [1A✔                                          | Adding                      | README.md...        | [-12ms]      |            |                                           |         |     |    |           |            |     |
+| >                                                  | ⧗                           | Setting             | up           |            |                                           |         |     |    |           |            |     |
+| [1A✔                                          | Setting                     | up                  | [53ms]       |            |                                           |         |     |    |           |            |     |
+| >                                                  | ⧗                           | Parsing             | template     | parameters |                                           |         |     |    |           |            |     |
+| [1A✔                                          | Parsing                     | template            | parameters   | [188ms]    |                                           |         |     |    |           |            |     |
+| >                                                  | ⧗                           | Detecting           | persistent   | resources  |                                           |         |     |    |           |            |     |
+| Terraform                                          | 1.5.3                       |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_parameter.org-url:                      | Refreshing...               |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_provisioner.ii:                         | Refreshing...               |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_workspace.ii:                           | Refreshing...               |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_parameter.container-image:              | Refreshing...               |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_parameter.git-url:                      | Refreshing...               |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_provisioner.ii:                         | Refresh                     | complete            | after        | 0s         | [id=1763f52f-cbac-4480-8d67-ea4048e7e3ca] |         |     |    |           |            |     |
+| data.coder_workspace.ii:                           | Refresh                     | complete            | after        | 0s         | [id=e60fbd43-6125-41b7-9819-d1c92f086b34] |         |     |    |           |            |     |
+| data.coder_parameter.container-image:              | Refresh                     | complete            | after        | 0s         | [id=ba4873b8-34d3-4b23-a437-8533fcbfc7cb] |         |     |    |           |            |     |
+| data.coder_parameter.org-url:                      | Refresh                     | complete            | after        | 0s         | [id=664333e7-4381-4f0e-a0ae-da7ba48d15e2] |         |     |    |           |            |     |
+| data.coder_parameter.git-url:                      | Refresh                     | complete            | after        | 0s         | [id=c651ac01-a9fb-4165-aff8-37263a5380ed] |         |     |    |           |            |     |
+| template_dir.ephemeral:                            | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| template_dir.persistent:                           | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_agent.iipod:                                 | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| null_resource.namespace:                           | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_app.Emacs:                                   | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_app.web:                                     | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_app.vnc:                                     | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_app.tmux:                                    | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_metadata.namespace[0]:                       | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| kubernetes_deployment.iipod[0]:                    | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_metadata.iipod[0]:                           | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| Plan:                                              | 11                          | to                  | add,         | 0          | to                                        | change, |   0 | to | destroy.  |            |     |
+| ✔                                                 | Detecting                   | persistent          | resources    | [29140ms]  |                                           |         |     |    |           |            |     |
+| >                                                  | ⧗                           | Detecting           | ephemeral    | resources  |                                           |         |     |    |           |            |     |
+| Terraform                                          | 1.5.3                       |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_workspace.ii:                           | Refreshing...               |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_provisioner.ii:                         | Refreshing...               |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_parameter.org-url:                      | Refreshing...               |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_parameter.container-image:              | Refreshing...               |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_parameter.git-url:                      | Refreshing...               |                     |              |            |                                           |         |     |    |           |            |     |
+| data.coder_provisioner.ii:                         | Refresh                     | complete            | after        | 0s         | [id=df2af265-cd0b-4bd3-ae86-8cc4374213ca] |         |     |    |           |            |     |
+| data.coder_workspace.ii:                           | Refresh                     | complete            | after        | 0s         | [id=85ea867d-f76d-47b8-b2d9-23ebcefcb532] |         |     |    |           |            |     |
+| data.coder_parameter.org-url:                      | Refresh                     | complete            | after        | 0s         | [id=29984c9d-e6e3-4480-b1e3-01579f2a8e8d] |         |     |    |           |            |     |
+| data.coder_parameter.container-image:              | Refresh                     | complete            | after        | 0s         | [id=cc4253e9-bbfb-4dd8-8d16-69b7ac3bd8d5] |         |     |    |           |            |     |
+| data.coder_parameter.git-url:                      | Refresh                     | complete            | after        | 0s         | [id=fa58b7ca-e20b-46a8-a3a9-3f2bd19d47b0] |         |     |    |           |            |     |
+| template_dir.ephemeral:                            | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| template_dir.persistent:                           | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| null_resource.namespace:                           | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_agent.iipod:                                 | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_app.web:                                     | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_app.tmux:                                    | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_app.vnc:                                     | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| coder_app.Emacs:                                   | Plan                        | to                  | create       |            |                                           |         |     |    |           |            |     |
+| Plan:                                              | 8                           | to                  | add,         | 0          | to                                        | change, |   0 | to | destroy.  |            |     |
+| ✔                                                 | Detecting                   | ephemeral           | resources    | [17198ms]  |                                           |         |     |    |           |            |     |
+| >                                                  | ⧗                           | Cleaning            | Up           |            |                                           |         |     |    |           |            |     |
+| [1A✔                                          | Cleaning                    | Up                  | [292ms]      |            |                                           |         |     |    |           |            |     |
+| ┌─────────────────────────────────┐ |                             |                     |              |            |                                           |         |     |    |           |            |     |
+| │                                                  | Template                    | Preview             | │            |            |                                           |         |     |    |           |            |     |
+| ├─────────────────────────────────┤ |                             |                     |              |            |                                           |         |     |    |           |            |     |
+| │                                                  | RESOURCE                    | │                   |              |            |                                           |         |     |    |           |            |     |
+| ├─────────────────────────────────┤ |                             |                     |              |            |                                           |         |     |    |           |            |     |
+| │                                                  | kubernetes_deployment.iipod | │                   |              |            |                                           |         |     |    |           |            |     |
+| │                                                  | └─                          | iipod               | (linux,      | amd64)     | │                                         |         |     |    |           |            |     |
+| ├─────────────────────────────────┤ |                             |                     |              |            |                                           |         |     |    |           |            |     |
+| │                                                  | null_resource.namespace     | │                   |              |            |                                           |         |     |    |           |            |     |
+| ├─────────────────────────────────┤ |                             |                     |              |            |                                           |         |     |    |           |            |     |
+| │                                                  | template_dir.ephemeral      | │                   |              |            |                                           |         |     |    |           |            |     |
+| ├─────────────────────────────────┤ |                             |                     |              |            |                                           |         |     |    |           |            |     |
+| │                                                  | template_dir.persistent     | │                   |              |            |                                           |         |     |    |           |            |     |
+| └─────────────────────────────────┘ |                             |                     |              |            |                                           |         |     |    |           |            |     |
+|                                                    |                             |                     |              |            |                                           |         |     |    |           |            |     |
+| The                                                | zzpod3                      | template            | has          | been       | created                                   | at      | Jul | 31 | 19:16:11! | Developers | can |
+| provision                                          | a                           | workspace           | with         | this       | template                                  | using:  |     |    |           |            |     |
+|                                                    |                             |                     |              |            |                                           |         |     |    |           |            |     |
+| coder                                              | create                      | --template="zzpod3" | [workspace   | name]      |                                           |         |     |    |           |            |     |
+|                                                    |                             |                     |              |            |                                           |         |     |    |           |            |     |
+
+
+when that is done, you can create a new workspace from that template with:
+
+#+begin_src tmux :session coder :var templatename="zzpod3" workspace="zz3"
+coder create --template $templatename $workspace
+#+end_src
+
+
+** Building and pushing a new image
+*** Login into ghcr
+
+To push our image to ghcr, you need to login to it using a github personal access token as your password
+
+#+begin_src tmux :session coder
+docker login -u zachmandeville  --password-stdin
+#+end_src
+
+The personal access token should have write permissions for packages.
+
+***  Build and tag the image
+#+begin_src sh :dir ../../build
+docker build -t iipod:2023.07.31-clip .
+#+end_src

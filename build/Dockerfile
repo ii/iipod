@@ -74,7 +74,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
     asciinema \
     ssh-import-id \
     docker-ce-cli \
-    novnc \
     tigervnc-standalone-server \
     icewm \
     kitty \
@@ -90,6 +89,9 @@ RUN DEBIAN_FRONTEND=noninteractive \
 	&& rm -rf /var/lib/apt/lists/*
     # ubuntu-desktop \
     # && apt-key fingerprint 0EBFCD88 \
+
+# Install novnc from juanjodiaz branch
+RUN git clone --branch add_clipboard_support https://github.com/juanjoDiaz/noVNC.git /usr/share/novnc
 
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
   && touch /etc/localtime
