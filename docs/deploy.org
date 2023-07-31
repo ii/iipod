@@ -127,7 +127,7 @@ export CODER_CONFIG_DIR=~/.config/space.cloudnative.nz
 cd ~/iipod
 coder template push --create \
     --yes \
-    --directory ~/space-templates/iipod \
+    --directory . \
     --message "Updating Template because of X" \
     --variable dns_update_keysecret=$DNS_UPDATE_KEYSECRET \
     --variable pdns_account=$PDNS_ACCOUNT \
