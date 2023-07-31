@@ -91,8 +91,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
     # && apt-key fingerprint 0EBFCD88 \
 
 # Install novnc from juanjodiaz branch
-RUN git clone --branch add_clipboard_support https://github.com/juanjoDiaz/noVNC.git /tmp/novnc && \
-    sudo cp -R /tmp/novnc /usr/share
+RUN git clone --branch add_clipboard_support https://github.com/juanjoDiaz/noVNC.git /usr/share/novnc
 
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
   && touch /etc/localtime
