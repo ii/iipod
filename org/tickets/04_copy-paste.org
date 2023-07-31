@@ -89,9 +89,7 @@ So in our[[file:~/src/ii/iipod/build/Dockerfile][ build/Dockerfile]]  we comment
 And add a manual install after this first run command:
 
 #+begin_example
-RUN sudo apt-get purge -y novnc && \
-    git clone --branch add_clipboard_support https://github.com/juanjoDiaz/noVNC.git /tmp/novnc && \
-    sudo cp -R /tmp/novnc /usr/share
+RUN git clone --branch add_clipboard_support https://github.com/juanjoDiaz/noVNC.git /usr/share/novnc
 #+end_example
 
 We can then build and push this new image (see footnotes for method).
@@ -169,9 +167,6 @@ Locally, i select a text field and right click to choose "paste". I get ~testing
 I do the same steps from within firefox, with same results.
 *Copying from vsc works in firefox*.
 ** Copying from kitty :success:
-:LOGBOOK:
-CLOCK: [2023-07-31 Mon 17:24]--[2023-07-31 Mon 18:55] =>  1:31
-:END:
 *** Chrome
  In our novnc, i navigate to the open kitty terminal. It is showing the terminal from within a tmux window.
 
@@ -273,7 +268,7 @@ these images on push. That work might best be done as a short, separate ticket.
 * Footnotes
 ** Creating iipod workspaces
 
-The simplest way I found to make a workspace is to set up the config in this tnagled file, making use of env vars, and then
+The simplest way I found to make a workspace is to set up the config in this tangled file, making use of env vars, and then
 include this as a variables file in our template creation
 
 This assumes the presence of a .envrc file and that you are using direnv
