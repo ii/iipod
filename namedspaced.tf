@@ -68,11 +68,17 @@ COMMAND
 }
 # We have manifests to create the namespace and persist a few things
 provisioner "local-exec" {
+  depends_on = [
+    template_dir.persistent
+  ]
   # - the main *.user.DOMAIN cert
   command = "../../kubectl apply -f persistent"
 }
 # We have manifests to create the namespace
 provisioner "local-exec" {
+  depends_on = [
+    template_dir.ephemeral
+  ]
   command = "../../kubectl apply -f ephemeral"
 }
 # On the way down, just want to use kubectl to remove the epherical k8s objects
@@ -88,6 +94,9 @@ COMMAND
 }
 # We have manifests to create the namespace
 provisioner "local-exec" {
+  depends_on = [
+    template_dir.ephemeral
+  ]
   when    = destroy
   command = "../../kubectl delete -f ephemeral"
 }
