@@ -88,8 +88,18 @@ COMMAND
 }
 # We have manifests to create the namespace
 provisioner "local-exec" {
-  when    = destroy
-  command = "../../kubectl delete -f ephemeral"
+  when = destroy
+  # Destroy provisioners can't depend on anything els
+  # But we just want to delete ephemeral resources
+  # while retaining our namespace and certs
+  command = <<COMMAND
+  # This won't work because the template_dir output does not exist
+  # ../../kubectl delete -f ephemeral
+  # So we delete specific objects with spacename=$SPACENAME label
+  SPACENAME=$(cat terraform.tfstate  | jq -r '.resources[0].instances[0].attributes.name')
+  OWNER=$(cat terraform.tfstate  | jq -r '.resources[0].instances[0].attributes.owner')
+  ../../kubectl delete -n $OWNER svc,deployments,ingress -l spacename=$SPACENAME
+COMMAND
 }
 # We could also deloy logstream-kube to show the pod coming up...
 #   provisioner "local-exec" {

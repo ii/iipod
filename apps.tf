@@ -17,7 +17,7 @@ resource "coder_app" "tmux" {
   display_name = "tmux"
   icon         = "https://cdn.icon-icons.com/icons2/2148/PNG/512/tmux_icon_131831.png"
   agent_id     = coder_agent.iipod.id
-  url          = "http://localhost:7681" # 7681 is the default ttyd port
+  url          = "http://localhost:7681" # 7681 is the default ttyd port, which calls 'tmux at -s $SPACENAME'
 }
 
 # vnc
@@ -28,7 +28,7 @@ resource "coder_app" "vnc" {
   display_name = "vnc"
   icon         = "/icon/novnc.svg"
   agent_id     = coder_agent.iipod.id
-  url          = "http://localhost:6080?autoconnect=true&resize=remote" # 7681 is the default ttyd port
+  url          = "http://localhost:6080?autoconnect=true&resize=remote" # 6080 port we chose for websockify
 }
 
 # web
@@ -39,7 +39,7 @@ resource "coder_app" "web" {
   display_name = "web"
   # icon         = "https://cdn.icon-icons.com/icons2/2148/PNG/512/tmux_icon_131831.png"
   agent_id = coder_agent.iipod.id
-  url      = "http://localhost:8000"
+  url      = "http://localhost:8000" # port 8000 is the default 'python -m http.server' port
 }
 
 # resource "coder_app" "code-server" {
