@@ -10,6 +10,6 @@ spec:
     - "${username}.${coder_domain}"
     - "*.${username}.${coder_domain}"
   issuerRef:
-    name: letsencrypt-staging
+    name: letsencrypt-pdns-staging
     kind: ClusterIssuer
     group: cert-manager.io
