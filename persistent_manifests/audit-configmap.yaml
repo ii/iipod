@@ -1,0 +1,29 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-audit
+  namespace: ${username}
+data:
+  sink.yaml: |
+    apiVersion: v1
+    kind: Config
+    current-context: auditsink-context
+    clusters:
+      - name: auditsink-cluster
+        cluster:
+          server: http://auditlogger-x-default-x-k8s-${username}.${username}:9900/events
+    contexts:
+      - context:
+          user: ""
+          cluster: auditsink-cluster
+        name: auditsink-context
+    users: []
+    preferences: {}
+  policy.yaml: |
+    apiVersion: audit.k8s.io/v1
+    kind: Policy
+    rules:
+      - level: Metadata
+        stages:
+          - ResponseComplete
