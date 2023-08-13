@@ -1,0 +1,82 @@
+#+title: Vcluster
+#+PROPERTY: header-args:tmux :session ":default"
+* local machine
+:PROPERTIES:
+:header-args:tmux+: :session ":local"
+:END:
+** install / update coder
+#+begin_src tmux
+curl -fsSL https://coder.com/install.sh | sh
+#+end_src
+** login to coder
+#+begin_src tmux
+coder login https://space.cloudnative.nz
+#+end_src
+** create coder workspace
+#+begin_src tmux
+coder create --template=iipod myspace
+#+end_src
+** update ssh-config
+#+begin_src tmux
+coder config-ssh -y
+#+end_src
+** connect via ssh
+#+begin_src tmux
+ssh -A coder.myspace
+#+end_src
+** retrieve vkubeconfig
+#+begin_src tmux
+ssh coder.myspace kubectl get secret vkubeconfig -o json | jq .data.config -r | base64 -d > ~/vkubeconfig.yaml
+#+end_src
+** use vcluster from local machine
+#+begin_src tmux
+export KUBECONFIG=~/vkubeconfig.yaml
+kubectl get all -A
+#+end_src
+* host cluster
+:PROPERTIES:
+:header-args:tmux+: :session ":cluster"
+:END:
+** connect via ssh
+(Or ensure you can reach the outer cluster)
+#+begin_src tmux
+ssh -A coder.myspace
+#+end_src
+** namespace events
+#+begin_src tmux :session ":events"
+kubectl get events -w
+#+end_src
+** vcluster pod logs
+#+begin_src tmux
+kubectl logs -l app=vcluster -f
+#+end_src
+** wait for vcluster deployment to be available
+#+begin_src tmux
+kubectl wait --timeout=10m --for=condition=Available -l app=vcluster-api deployment
+#+end_src
+** retrieve vkubeconfig
+#+begin_src tmux
+kubectl get secret vkubeconfig -o json | jq .data.config -r | base64 -d > ~/vkubeconfig.yaml
+chmod 600 ~/vkubeconfig.yaml
+#+end_src
+* vcluster
+** wait for flux crd for helmreleases to exist
+#+begin_src tmux
+export KUBECONFIG=~/vkubeconfig.yaml
+kubectl wait --for condition=established --timeout=10m crd/helmreleases.helm.toolkit.fluxcd.io
+#+end_src
+** install flux helmrelease for apisnoop
+#+begin_src tmux
+export KUBECONFIG=~/vkubeconfig.yaml
+kubectl apply -f https://raw.githubusercontent.com/cncf/apisnoop/vcluster/charts/flux-deploy.yaml
+#+end_src
+** wait for snoopdb to be "released"
+#+begin_src tmux
+export KUBECONFIG=~/vkubeconfig.yaml
+kubectl -n flux-system  wait --timeout=10m --for=condition=Released helmrelease snoopdb
+#+end_src
+** snoopdb logs
+#+begin_src tmux
+export KUBECONFIG=~/vkubeconfig.yaml
+kubectl -n default logs statefulset/snoopdb --since=1s -f
+#+end_src
