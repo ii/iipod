@@ -68,6 +68,11 @@ COMMAND
 }
 # We have manifests to create the namespace and persist a few things
 provisioner "local-exec" {
+  # unsure the user has a namespace
+  command = "../../kubectl create ns ${local.namespace} || true"
+}
+# We have manifests to create the namespace and persist a few things
+provisioner "local-exec" {
   # - the main *.user.DOMAIN cert
   command = "../../kubectl apply -f persistent"
 }
