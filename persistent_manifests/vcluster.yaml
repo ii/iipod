@@ -98,31 +98,31 @@ spec:
           release:
             name: "flux"
             namespace: "flux-system"
-        - chart:
-            name: operator
-            repo: https://operator.min.io
-            # version: "v5.0.7"
-          release:
-            name: "operator"
-            namespace: "minio-operator"
-          values:
-            console:
-              ingress:
-                enabled: true
-                ingressClassName: nginx
-                host: minio-operator.${username}.cloudnative.nz
-                tls:
-                  - secretName: wildcard-tls
-                    hosts:
-                    hosts:
-                      - minio-operator.${username}.cloudnative.nz
-              env:
-                - name: CONSOLE_DEBUG_ENV
-                  value: "true"
-            operator:
-              env:
-                - name: DEBUG_ENV_VAR
-                  value: "true"
+        # - chart:
+        #     name: operator
+        #     repo: https://operator.min.io
+        #     # version: "v5.0.7"
+        #   release:
+        #     name: "operator"
+        #     namespace: "minio-operator"
+        #   values:
+        #     console:
+        #       ingress:
+        #         enabled: true
+        #         ingressClassName: nginx
+        #         host: minio-operator.${username}.cloudnative.nz
+        #         tls:
+        #           - secretName: wildcard-tls
+        #             hosts:
+        #             hosts:
+        #               - minio-operator.${username}.cloudnative.nz
+        #       env:
+        #         - name: CONSOLE_DEBUG_ENV
+        #           value: "true"
+        #     operator:
+        #       env:
+        #         - name: DEBUG_ENV_VAR
+        #           value: "true"
         # values: |-
         #   console:
         #     ingress:
