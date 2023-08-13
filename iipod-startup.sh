@@ -90,3 +90,33 @@ ii
 EOF
 kitty -T KITTY --detach --hold --start-as=maximized bash -c 'tmux at'
 "
+
+echo "Starting TMUX session: cluster:events"
+tmux new -d -s "cluster" -n events
+tmux send-keys -t "cluster:events" "
+kubectl get events -w
+"
+
+echo "Starting TMUX session: cluster:vcluster"
+tmux new-window -d -t "cluster" -n "vlogs"
+tmux send-keys -t "cluster:vlogs" "
+sleep 10
+kubectl wait --timeout=10m --for=condition=Available -l app=vcluster-api deployment
+kubectl logs -l app=vcluster -f
+"
+
+echo "Starting TMUX session: cluster:vcluster"
+tmux new-window -d -t "cluster" -n "vcluster"
+tmux send-keys -t "cluster:vcluster" "
+sleep 30 # would like to not sleep here
+kubectl wait --timeout=10m --for=condition=Available -l app=vcluster-api deployment
+sleep 30 # would like to not sleep here
+kubectl get secret vkubeconfig -o json | jq .data.config -r | base64 -d > ~/vkubeconfig.yaml
+export KUBECONFIG=~/vkubeconfig.yaml
+chmod 600 ~/vkubeconfig.yaml
+sleep 10 # would like to not sleep here
+kubectl wait --for condition=established --timeout=10m crd/helmreleases.helm.toolkit.fluxcd.io
+kubectl apply -f https://raw.githubusercontent.com/cncf/apisnoop/vcluster/charts/flux-deploy.yaml
+kubectl -n flux-system  wait --timeout=10m --for=condition=Released helmrelease snoopdb
+kubectl -n default logs statefulset/snoopdb --since=1s -f
+"
