@@ -9,10 +9,13 @@
 curl -fsSL https://coder.com/install.sh | sh
 #+end_src
 ** login to coder
+Click on the /cli-auth url and login to coder.
+Then paste your login token back inside the shell and hit enter.
 #+begin_src tmux
 coder login https://space.cloudnative.nz
 #+end_src
 ** create coder workspace
+Hit enter to take all the defaults.
 #+begin_src tmux
 coder create --template=iipod myspace
 #+end_src
@@ -20,11 +23,12 @@ coder create --template=iipod myspace
 #+begin_src tmux
 coder config-ssh -y
 #+end_src
-** connect via ssh
+** connect to your space via ssh
 #+begin_src tmux
-ssh -A coder.myspace
+ssh -A coder.myspace -t tmux at
 #+end_src
 ** retrieve vkubeconfig
+In another window on your local machine.
 #+begin_src tmux
 ssh coder.myspace kubectl get secret vkubeconfig -o json | jq .data.config -r | base64 -d > ~/vkubeconfig.yaml
 #+end_src
