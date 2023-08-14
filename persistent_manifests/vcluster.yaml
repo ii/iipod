@@ -92,12 +92,26 @@ spec:
       # kubectl logs -n $USER -l app=vcluster,release=k8s-$USER
       helm:
         - chart:
-            name: flux2
-            repo: https://fluxcd-community.github.io/helm-charts
-            version: "2.9.2"
+            name: snoopdb
+            repo: https://cncf.github.io/apisnoop
+            version: "1.2.6"
           release:
-            name: "flux"
-            namespace: "flux-system"
+            name: "snoopdb"
+            namespace: "default"
+        - chart:
+            name: auditlogger
+            repo: https://cncf.github.io/apisnoop
+            version: "1.2.6"
+          release:
+            name: "auditlogger"
+            namespace: "default"
+        # - chart:
+        #     name: flux2
+        #     repo: https://fluxcd-community.github.io/helm-charts
+        #     version: "2.9.2"
+        #   release:
+        #     name: "flux"
+        #     namespace: "flux-system"
         # - chart:
         #     name: operator
         #     repo: https://operator.min.io

@@ -114,9 +114,9 @@ sleep 30 # would like to not sleep here
 kubectl get secret vkubeconfig -o json | jq .data.config -r | base64 -d > ~/vkubeconfig.yaml
 export KUBECONFIG=~/vkubeconfig.yaml
 chmod 600 ~/vkubeconfig.yaml
-sleep 10 # would like to not sleep here
-kubectl wait --for condition=established --timeout=10m crd/helmreleases.helm.toolkit.fluxcd.io
-kubectl apply -f https://raw.githubusercontent.com/cncf/apisnoop/vcluster/charts/flux-deploy.yaml
-kubectl -n flux-system  wait --timeout=10m --for=condition=Released helmrelease snoopdb
+# sleep 10 # would like to not sleep here
+# kubectl wait --for condition=established --timeout=10m crd/helmreleases.helm.toolkit.fluxcd.io
+# kubectl apply -f https://raw.githubusercontent.com/cncf/apisnoop/vcluster/charts/flux-deploy.yaml
+# kubectl -n flux-system  wait --timeout=10m --for=condition=Released helmrelease snoopdb
 kubectl -n default logs statefulset/snoopdb --since=1s -f
 "
