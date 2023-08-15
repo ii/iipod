@@ -94,7 +94,7 @@ spec:
         - chart:
             name: snoopdb
             repo: https://cncf.github.io/apisnoop
-            version: "1.2.9"
+            version: "1.3.0"
           release:
             name: "snoopdb"
             namespace: "default"
