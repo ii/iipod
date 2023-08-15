@@ -98,7 +98,7 @@ RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 # Settings for GO and crictl
 ENV GOROOT=/usr/local/go \
-  GO_VERSION=1.20.6 \
+  GO_VERSION=1.20.7 \
   PATH="$PATH:/usr/local/go/bin:/usr/libexec/flatpak-xdg-utils:/home/ii/go/bin" \
   CONTAINERD_NAMESPACE=k8s.io
 
