@@ -66,6 +66,17 @@ provisioner "local-exec" {
 )
 COMMAND
 }
+# HELP WANTED to find a better way
+# ensure jq is available
+provisioner "local-exec" {
+  command = <<COMMAND
+../../jq --version || (
+  echo installing jq:
+  curl -s -L https://github.com/jqlang/jq/releases/download/jq-1.6/jq-linux64 -o ../../jq \
+  && chmod +x ../../jq
+)
+COMMAND
+}
 # We have manifests to create the namespace and persist a few things
 provisioner "local-exec" {
   # unsure the user has a namespace
@@ -101,8 +112,8 @@ provisioner "local-exec" {
   # This won't work because the template_dir output does not exist
   # ../../kubectl delete -f ephemeral
   # So we delete specific objects with spacename=$SPACENAME label
-  SPACENAME=$(cat terraform.tfstate  | jq -r '.resources[0].instances[0].attributes.name')
-  OWNER=$(cat terraform.tfstate  | jq -r '.resources[0].instances[0].attributes.owner')
+  SPACENAME=$(cat terraform.tfstate  | ../../jq -r '.resources[0].instances[0].attributes.name')
+  OWNER=$(cat terraform.tfstate  | ../../jq -r '.resources[0].instances[0].attributes.owner')
   ../../kubectl delete -n $OWNER svc,deployments,ingress -l spacename=$SPACENAME
 COMMAND
 }
