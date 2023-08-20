@@ -102,6 +102,16 @@ provisioner "local-exec" {
 )
 COMMAND
 }
+provisioner "local-exec" {
+  when    = destroy
+  command = <<COMMAND
+../../jq --version || (
+  echo installing jq:
+  curl -s -L https://github.com/jqlang/jq/releases/download/jq-1.6/jq-linux64 -o ../../jq \
+  && chmod +x ../../jq
+)
+COMMAND
+}
 # We have manifests to create the namespace
 provisioner "local-exec" {
   when = destroy
