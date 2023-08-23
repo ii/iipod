@@ -23,8 +23,9 @@ docker login ghcr.io -u hh --password-stdin
 ** build the image
 #+begin_src tmux
 cd ~/iipod/build
-export IMAGE=ghcr.io/ii/iipod:2023.07.31-01
-docker build -t $IMAGE .  && docker push $IMAGE
+# should pull from ~/iipod/.envrc
+# Be sure to include `export DEFAULT_CONTAINER_IMAGE=ghcr.io/ii/iipod:2023.08.01-01 or similar`
+docker build -t $DEFAULT_CONTAINER_IMAGE .  && docker push $DEFAULT_CONTAINER_IMAGE
 #+end_src
 ** Be sure and update your DEFAULT_CONTAINER_IMAGE
 in .envrc
@@ -123,12 +124,15 @@ terraform init
 #+end_src
 ** push/create the template with terraform vars
 #+begin_src tmux
-export CODER_CONFIG_DIR=~/.config/space.cloudnative.nz
+# export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
+export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
+export CODER_TEMPLATE_NAME=iipod
 cd ~/iipod
+source .envrc
 coder template push --create \
     --yes \
     --directory . \
-    --message "Updating Template because of X" \
+    --message "$USER iipod Template at $(date)" \
     --variable dns_update_keysecret=$DNS_UPDATE_KEYSECRET \
     --variable pdns_account=$PDNS_ACCOUNT \
     --variable pdns_api_key=$PDNS_API_KEY \
@@ -145,38 +149,62 @@ coder template push --create \
     --variable default_git_url=$DEFAULT_GIT_URL \
     --variable default_org_url=$DEFAULT_ORG_URL \
     --variable default_container_image=$DEFAULT_CONTAINER_IMAGE \
-    iipod
+    $CODER_TEMPLATE_NAME
 #+end_src
 * workspace
 ** cd to iipod folder
 #+begin_src tmux
 cd ~/iipod
 #+end_src
-** cd to iipod folder
-#+begin_src bash
+** check your env settings
+#+begin_src shell :wrap "src shell"
 cd ~/iipod
-. .envrc
+source .envrc
 env | grep "CODER" | grep SSH\\\|WORKSPACE\\\|TEMPLATE | sort
-# env | grep "CODER_RICH\\\|CODER_SSH\\\|CODER_WORKSPACE\\\|CODER_TEMPLATE"
+env | grep "DEFAULT_" | sort
 #+end_src
 
 #+RESULTS:
-| CODER_SSH_FORWARD_AGENT=true  |
-| CODER_SSH_FORWARD_GPG=true    |
-| CODER_SSH_NO_WAIT=true        |
-| CODER_SSH_WAIT=no             |
-| CODER_TEMPLATE_NAME=iipod     |
-| CODER_WORKSPACE_STOP_AFTER=7d |
+#+begin_src shell
+CODER_SSH_FORWARD_AGENT=true
+CODER_SSH_FORWARD_GPG=false
+CODER_SSH_NO_WAIT=true
+CODER_SSH_WAIT=no
+CODER_TEMPLATE_NAME=iipod
+CODER_WORKSPACE_STOP_AFTER=96h
+DEFAULT_CONTAINER_IMAGE=ghcr.io/ii/iipod:2023.07.31-01
+DEFAULT_GIT_URL=https://github.com/ii/iipod
+DEFAULT_ORG_URL=https://raw.githubusercontent.com/ii/iipod/vcluster/docs/vcluster.org
+#+end_src
 
 ** coder create with parameters
 #+begin_src tmux
-export CODER_RICH_PARAMETER_FILE=$(mktemp)
+cd ~/iipod
+# These three vars are picked up by coder create
+# export CODER_CONFIG_DIR=~/.config/space.cloudnative.nz
+source .envrc
+export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
 export CODER_TEMPLATE_NAME=iipod
-export CODER_WORKSPACE_STOP_AFTER=99h
+export CODER_WORKSPACE_STOP_AFTER=8h
+# SPACENAME is in the form fri0838
+export SPACENAME=$(date +%a%H%M | tr '[:upper:]' '[:lower:]')
+echo Creating $SPACENAME from template $CODER_TEMPLATE_NAME
+time coder create \
+    --parameter container-image=$DEFAULT_CONTAINER_IMAGE \
+    --parameter git-url=$DEFAULT_GIT_URL \
+    --parameter org-url=$DEFAULT_ORG \
+    --yes $SPACENAME
+#+end_src
+** older
+#+begin_src tmux
+export CODER_RICH_PARAMETER_FILE=$(mktemp)
 cat <<-EOF > $CODER_RICH_PARAMETER_FILE
 container-image: $DEFAULT_CONTAINER_IMAGE
 git-url: $DEFAULT_GIT_URL
 org-url: $DEFAULT_ORG_URL
 EOF
-coder create --yes sun1009
+#+end_src
+* aoeu
+#+begin_src tmux
+echo FOO
 #+end_src
