@@ -1,0 +1,282 @@
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  host: k8s-${username}.cloudnative.nz
+syncer:
+  kubeConfigContextName: "k8s-${username}"
+  # https://www.vcluster.com/docs/config-reference
+  extraArgs:
+    # --target-namespace string
+    #   The namespace to run the virtual cluster in
+    #   (defaults to current namespace)
+    ### We are intentinally leaving this blank
+    # --tls-san strings
+    #    Add additional hostname or IP as a
+    #    Subject Alternative Name in the TLS cert
+    - --tls-san=k8s-${username}.cloudnative.nz
+    # --out-kube-config-server string
+    #   If specified, the virtual cluster will use this
+    #   server for the generated kube config
+    #   (e.g. https://my-vcluster.domain.com)
+    - --out-kube-config-server=https://k8s-${username}.cloudnative.nz
+    # --out-kube-config-secret string
+    #   If specified, the virtual cluster will write
+    #   the generated kube config to the given secret
+    - --out-kube-config-secret=vkubeconfig
+    # --out-kube-config-secret-namespace string
+    #   If specified, the virtual cluster will write the generated kube config in the given namespace
+    # - --out-kube-config-secret-namespace=hh
+controller:
+  image: registry.k8s.io/kube-controller-manager:v1.27.3
+scheduler:
+  image: registry.k8s.io/kube-scheduler:v1.27.3
+api:
+  image: registry.k8s.io/kube-apiserver:v1.27.3
+  extraArgs:
+    - "--audit-policy-file=/etc/kubernetes/audit/policy.yaml"
+    - "--audit-webhook-config-file=/etc/kubernetes/audit/sink.yaml"
+  volumeMounts:
+    - name: audit
+      mountPath: /etc/kubernetes/audit
+      readOnly: true
+  volumes:
+    - name: audit
+      configMap:
+        name: k8s-audit
+        items:
+          - key: sink.yaml
+            path: sink.yaml
+          - key: policy.yaml
+            path: policy.yaml
+fallbackHostDns: true
+sync:
+  ingresses:
+    enabled: true
+  # https://www.vcluster.com/docs/architecture/storage
+  persistentvolumes:
+    enabled: true
+  # If you want to create custom storage classes inside the vcluster.
+  storageclasses:
+    enabled: true
+init:
+  # Logs for these helm releases are avaiable at:
+  # kubectl logs -n $USER -l app=vcluster,release=k8s-$USER
+  helm:
+    - chart:
+        name: snoopdb
+        repo: https://cncf.github.io/apisnoop
+        version: "1.2.9"
+      release:
+        name: "snoopdb"
+        namespace: "default"
+    - chart:
+        name: auditlogger
+        repo: https://cncf.github.io/apisnoop
+        version: "1.2.9"
+      release:
+        name: "auditlogger"
+        namespace: "default"
+    # - chart:
+    #     name: flux2
+    #     repo: https://fluxcd-community.github.io/helm-charts
+    #     version: "2.9.2"
+    #   release:
+    #     name: "flux"
+    #     namespace: "flux-system"
+    # - chart:
+    #     name: operator
+    #     repo: https://operator.min.io
+    #     # version: "v5.0.7"
+    #   release:
+    #     name: "operator"
+    #     namespace: "minio-operator"
+    #   values:
+    #     console:
+    #       ingress:
+    #         enabled: true
+    #         ingressClassName: nginx
+    #         host: minio-operator.${username}.cloudnative.nz
+    #         tls:
+    #           - secretName: wildcard-tls
+    #             hosts:
+    #             hosts:
+    #               - minio-operator.${username}.cloudnative.nz
+    #       env:
+    #         - name: CONSOLE_DEBUG_ENV
+    #           value: "true"
+    #     operator:
+    #       env:
+    #         - name: DEBUG_ENV_VAR
+    #           value: "true"
+    # values: |-
+    #   console:
+    #     ingress:
+    #       enabled: true
+    #       ingressClassName: nginx
+    #       host: minio-operator.${username}.cloudnative.nz
+    # tls:
+    #   - secretname:
+    #     hosts:
+    #       - minio-operator.${username}.cloudnative.nz
+    # - chart:
+    #     name: ingress-nginx
+    #     repo: https://kubernetes.github.io/ingress-nginx
+    #     version: "4.7.0"
+    #   release:
+    #     name: "ingress-nginix"
+    #     namespace: "ingress-nginx"
+    #   values: |-
+    #     controller:
+    #       extraArgs:
+    #         enable-ssl-passthrough: true
+    #         default-ssl-certificate: "wildcard-tls"
+  manifests: |-
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: inner-namespace
+    ---
+    # apiVersion: v1
+    # kind: Namespace
+    # metadata:
+    #   name: ingress-nginx
+    # ---
+    # apiVersion: v1
+    # kind: Namespace
+    # metadata:
+    #   name: minio-operator
+    ---
+  manifestsTemplate: |-
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: {{ .Release.Name }}
+    # ---
+    # apiVersion: source.toolkit.fluxcd.io/v1
+    # kind: GitRepository
+    # metadata:
+    #   name: apisnoop
+    #   namespace: flux-system
+    # spec:
+    #   interval: 30m
+    #   url: https://github.com/cncf/apisnoop
+    #   ref:
+    #     branch: vcluster
+    #   ignore: |-
+    #     /*
+    #     !/charts/
+    # ---
+    # apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    # kind: HelmRelease
+    # metadata:
+    #   name: snoopdb
+    #   namespace: flux-system
+    # spec:
+    #   targetNamespace: default
+    #   releaseName: snoopdb
+    #   storageNamespace: flux-system
+    #   interval: 30m
+    #   # values:
+    #   #   image:
+    #   #     tag: "v20230619-0.2.0-584-g6289ec1"
+    #   chart:
+    #     spec:
+    #       chart: charts/snoopdb
+    #       sourceRef:
+    #         kind: GitRepository
+    #         name: apisnoop
+    #   # https://github.com/cncf/apisnoop/blob/main/charts/snoopdb/values.yaml
+    #   # values:
+    #   #   image:
+    #   #     repository: gcr.io/k8s-staging-apisnoop/snoopdb
+    #   #     tag: ""
+    # ---
+    # apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    # kind: HelmRelease
+    # metadata:
+    #   name: auditlogger
+    #   namespace: flux-system
+    # spec:
+    #   targetNamespace: default
+    #   releaseName: auditlogger
+    #   storageNamespace: flux-system
+    #   interval: 30m
+    #   # values:
+    #   #   image:
+    #   #     tag: "v20230201-0.2.0-445-g6d6e89d"
+    #   chart:
+    #     spec:
+    #       chart: charts/auditlogger
+    #       sourceRef:
+    #         kind: GitRepository
+    #         name: apisnoop
+    #   # https://github.com/cncf/apisnoop/blob/main/charts/auditlogger/values.yaml
+    #   # values:
+    #   #   image:
+    #   #     repository: gcr.io/k8s-staging-apisnoop/auditlogger
+    #   #     tag: ""
+    # ---
+    # # For some reason svcs are not applied FIXME
+    # apiVersion: v1
+    # kind: Service
+    # metadata:
+    #   labels:
+    #     app.kubernetes.io/component: source-controller
+    #     app.kubernetes.io/instance: flux-system
+    #     app.kubernetes.io/part-of: flux
+    #     app.kubernetes.io/version: v2.0.1
+    #     control-plane: controller
+    #   name: source-controller
+    #   namespace: flux-system
+    # spec:
+    #   type: ClusterIP
+    #   internalTrafficPolicy: Cluster
+    #   ports:
+    #     - name: http
+    #       port: 80
+    #       protocol: TCP
+    #       targetPort: http
+    #   selector:
+    #     app: source-controller
+    # ---
+    # # For some reason svcs are not applied FIXME
+    # apiVersion: v1
+    # kind: Service
+    # metadata:
+    #   labels:
+    #     app.kubernetes.io/instance: snoopdb
+    #     app.kubernetes.io/version: 2023-08.11-01
+    #   name: snoopdb
+    #   namespace: default
+    # spec:
+    #   type: ClusterIP
+    #   internalTrafficPolicy: Cluster
+    #   ports:
+    #     - name: postgres
+    #       port: 5432
+    #       protocol: TCP
+    #       targetPort: 5432
+    #   selector:
+    #     app.kubernetes.io/instance: snoopdb
+    #     app.kubernetes.io/name: snoopdb
+    # ---
+    # # For some reason svcs are not applied FIXME
+    # apiVersion: v1
+    # kind: Service
+    # metadata:
+    #   labels:
+    #     app.kubernetes.io/instance: auditlogger
+    #     app.kubernetes.io/version: 2023-08.11-01
+    #   name: auditlogger
+    #   namespace: default
+    # spec:
+    #   type: ClusterIP
+    #   internalTrafficPolicy: Cluster
+    #   ports:
+    #     - name: http
+    #       port: 9900
+    #       protocol: TCP
+    #       targetPort: http
+    #   selector:
+    #     app.kubernetes.io/instance: auditlogger
+    #     app.kubernetes.io/name: auditlogger
