@@ -23,7 +23,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
     bash-completion \
     less \
     git \
-    golang \
     xz-utils \
     sudo \
     vim \
