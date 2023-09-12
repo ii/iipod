@@ -1,0 +1,41 @@
+#+title: Vcluster
+* Starting TMUX session: cluster
+# tmux new -d -s "cluster" -n events
+#+begin_src shell
+#+end_src
+** events
+#+begin_src tmux :session "cluster:event"
+kubectl get events -w
+#+end_src
+** vlogs
+*** wait for deployment to occur
+#+begin_src tmux :session "cluster:vlogs"
+kubectl wait \
+  --timeout=10m \
+  --for=condition=Available \
+  -l app=vcluster-api\
+  deployment
+#+end_src
+*** looking at logs as they are created
+#+begin_src tmux :session "cluster:vlogs"
+kubectl logs -f \
+  -l app=vcluster
+#+end_src
+** vcluster
+*** wait for deployment to occer
+#+begin_src tmux :session "cluster:vcluster"
+kubectl wait --timeout=10m --for=condition=Available -l app=vcluster-api deployment
+#+end_src
+*** grab the kubeconfig
+#+begin_src tmux :session "cluster:vcluster"
+kubectl get secret vkubeconfig -o json | jq .data.config -r | base64 -d > ~/vkubeconfig.yaml
+export KUBECONFIG=~/vkubeconfig.yaml
+chmod 600 ~/vkubeconfig.yaml
+#+end_src
+*** within the vcluster wait for flux to deploy apisnoop
+#+begin_src tmux :session "cluster:vcluster"
+kubectl wait --for condition=established --timeout=10m crd/helmreleases.helm.toolkit.fluxcd.io
+kubectl apply -f https://raw.githubusercontent.com/cncf/apisnoop/vcluster/charts/flux-deploy.yaml
+kubectl -n flux-system  wait --timeout=10m --for=condition=Released helmrelease snoopdb
+ubectl -n default logs statefulset/snoopdb --since=1s -f
+#+end_src
