@@ -24,6 +24,13 @@ resource "coder_agent" "iipod" {
     GIT_AUTHOR_EMAIL    = "${data.coder_workspace.ii.owner_email}"
     GIT_COMMITTER_EMAIL = "${data.coder_workspace.ii.owner_email}"
   }
+  display_apps {
+    port_forwarding_helper = true
+    ssh_helper = true
+    vscode = true
+    vscode_insiders = true
+    web_terminal = true
+  }
   metadata {
     key          = "tmux-clients"
     display_name = "tmux clients"
