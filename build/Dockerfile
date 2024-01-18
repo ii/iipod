@@ -31,7 +31,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
     dpkg-dev \
     devscripts \
     language-pack-en \
-    libgccjit-12-dev \
+    libgccjit-10-dev \
     libgtk-3-bin \
     openssh-client \
     postgresql-client \
