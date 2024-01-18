@@ -1,5 +1,6 @@
-FROM ubuntu:lunar-20230615
+FROM ubuntu:focal-20231211
 
+# install enough to setup apt repos
 RUN DEBIAN_FRONTEND=noninteractive \
     apt update \
     && apt upgrade -y \
@@ -232,7 +233,7 @@ RUN sudo su -c "kubectl completion bash > /etc/bash_completion.d/kubectl"
 
 # Ensure we have the deps for building emacs from HEAD
 RUN add-apt-repository ppa:ubuntu-elisp/ppa --yes && \
-  sed -i -e 's/^#\ //' /etc/apt/sources.list.d/ubuntu-elisp-ubuntu-ppa-lunar.list && \
+  sed -i -e 's/^#\ //' /etc/apt/sources.list.d/ubuntu-elisp-ubuntu-ppa-focal.list && \
   DEBIAN_FRONTEND="noninteractive" apt-get update && \
   DEBIAN_FRONTEND="noninteractive" apt-get -y build-dep emacs-snapshot
 
