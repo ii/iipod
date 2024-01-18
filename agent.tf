@@ -8,6 +8,7 @@ resource "coder_agent" "iipod" {
   connection_timeout      = 300
   startup_script          = file("./iipod-startup.sh")
   startup_script_timeout  = 300
+  startup_script          = file("./iipod-shutdown.sh")
   shutdown_script         = "#!/bin/sh\necho Box is on it's way down!"
   shutdown_script_timeout = 300
   env = {
