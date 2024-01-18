@@ -7,18 +7,31 @@ RUN DEBIAN_FRONTEND=noninteractive \
     && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y \
       software-properties-common \
       gpg-agent \
-      curl \
-    && add-apt-repository ppa:git-core/ppa -y \
+      curl
+
+# setup apt repos and update available packages
+RUN DEBIAN_FRONTEND=noninteractive \
+    && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+      | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+      | gpg --dearmor -o /usr/share/keyrings/docker.gpg \
+    && curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+      | gpg --dearmor -o /usr/share/keyrings/google.gpg \
     && add-apt-repository ppa:mozillateam/ppa -y \
-    && add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" -y \
-    && add-apt-repository "deb https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" -y \
-    && apt-add-repository "deb http://packages.cloud.google.com/apt cloud-sdk main" -y \
-    && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /etc/apt/trusted.gpg.d/microsoft.gpg \
-    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/docker.gpg \
-    && curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/google.gpg \
-    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash -x - \
-    && apt-get update \
-    && DEBIAN_FRONTEND="noninteractive" apt-get install --yes \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" \
+      > /etc/apt/sources.list.d/microsoft.list \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+      > /etc/apt/sources.list.d/docker.list \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" \
+      > /etc/apt/sources.list.d/google.list \
+    && curl -fsSL https://deb.nodesource.com/setup_lts.x \
+      | bash -x - \
+    && DEBIAN_FRONTEND=noninteractive apt-get update
+
+
+# install main packages
+RUN DEBIAN_FRONTEND=noninteractive \
+    apt-get install --yes \
     tmux \
     tmate \
     bash-completion \
