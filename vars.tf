@@ -135,22 +135,22 @@ variable "default_org_url" {
   }
 }
 
-variable "local_ip" {
+variable "ingress_ip" {
   type        = string
   description = "Local LB IP"
   nullable    = false
   validation {
-    condition     = can(cidrhost("${var.local_ip}/32", 0))
+    condition     = can(cidrhost("${var.ingress_ip}/32", 0))
     error_message = "Must be valid IP Address"
   }
 
 }
-variable "public_ip" {
-  type        = string
-  description = "Public IP"
-  nullable    = false
-  validation {
-    condition     = can(cidrhost("${var.public_ip}/32", 0))
-    error_message = "Must be valid IP Address"
-  }
-}
+# variable "public_ip" {
+#   type        = string
+#   description = "Public IP"
+#   nullable    = false
+#   validation {
+#     condition     = can(cidrhost("${var.public_ip}/32", 0))
+#     error_message = "Must be valid IP Address"
+#   }
+# }

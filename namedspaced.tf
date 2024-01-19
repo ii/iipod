@@ -41,7 +41,7 @@ curl -L -s \
     NS2    = "ns2.ii.nz",
     ACCOUNTNAME : "${var.pdns_account}",
     KEYNAME : "${var.dns_update_keyname}",
-    IP : "${var.public_ip}"
+    INGRESS_IP : "${var.ingress_ip}"
 })}' ${var.pdns_api_url}/api/v1/servers/localhost/zones
 COMMAND
 }
