@@ -4,10 +4,16 @@ data "coder_provisioner" "ii" {
 data "coder_workspace" "ii" {
 }
 
+# Warning: Deprecated Resource
+# on vars.tf line 7, in data "coder_git_auth" "github":
 # data "coder_git_auth" "github" {
 #   # Matches the ID of the git auth provider in Coder.
-#   id = "primary-github"
+#   id = "github"
 # }
+
+data "coder_external_auth" "primary-github" {
+  id = "primary-github"
+}
 
 # Can be set via TF_VAR_variable_name in the coder process ENV
 # But can also be set via a file similar var/space.sharing.io.yaml

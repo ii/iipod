@@ -45,20 +45,36 @@ resource "kubernetes_deployment" "iipod" {
     labels = {
       "spacename" : local.spacename
       "spaceapp" : "iipod"
+      "app.kubernetes.io/name"     = "coder-workspace"
+      "app.kubernetes.io/instance" = "coder-workspace-${lower(data.coder_workspace.ii.owner)}-${lower(data.coder_workspace.ii.name)}"
+      "app.kubernetes.io/part-of"  = "coder"
+      "com.coder.resource"         = "true"
+      "com.coder.workspace.id"     = data.coder_workspace.ii.id
+      "com.coder.workspace.name"   = data.coder_workspace.ii.name
+      "com.coder.user.id"          = data.coder_workspace.ii.owner_id
+      "com.coder.user.username"    = data.coder_workspace.ii.owner
+    }
+    annotations = {
+      "com.coder.user.email" = data.coder_workspace.ii.owner_email
     }
   }
   spec {
-    # relicas = 1
+    replicas = 1
     selector {
       match_labels = {
-        spacename = local.spacename
+        spacename                = local.spacename
+        "app.kubernetes.io/name" = "coder-workspace"
       }
+    }
+    strategy {
+      type = "Recreate"
     }
     template {
       metadata {
         labels = {
           "spacename" : local.spacename
           "spaceapp" : "iipod"
+          "app.kubernetes.io/name" = "coder-workspace"
         }
       }
       spec {
@@ -75,6 +91,16 @@ resource "kubernetes_deployment" "iipod" {
           command = ["sh", "-c", coder_agent.iipod.init_script]
           security_context {
             run_as_user = "1001"
+          }
+          resources {
+            requests = {
+              "cpu"    = "250m"
+              "memory" = "512Mi"
+            }
+            limits = {
+              "cpu"    = "${data.coder_parameter.cpu.value}"
+              "memory" = "${data.coder_parameter.memory.value}Gi"
+            }
           }
           env {
             name  = "CODER_AGENT_TOKEN"

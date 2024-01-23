@@ -125,32 +125,33 @@ terraform init
 ** push/create the template with terraform vars
 #+begin_src tmux
 # export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
-export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
+export CODER_CONFIG_DIR=~/.config/coder.cloudnative.coop
 export CODER_TEMPLATE_NAME=iipod
 cd ~/iipod
 source .envrc
-coder template push --create \
+coder template push \
     --yes \
     --directory . \
-    --message "$USER iipod Template at $(date)" \
-    --variable dns_update_keysecret=$DNS_UPDATE_KEYSECRET \
-    --variable pdns_account=$PDNS_ACCOUNT \
-    --variable pdns_api_key=$PDNS_API_KEY \
-    --variable pdns_api_url=$PDNS_API_URL \
     --variable coder_url=$CODER_URL \
     --variable coder_domain=$CODER_DOMAIN \
-    --variable local_ip=$LOCAL_IP \
-    --variable public_ip=$PUBLIC_IP \
-    --variable pdns_api_url=$DNS_API_URL \
-    --variable pdns_account=$DNS_ACCOUNT \
-    --variable dns_update_server=$DNS_UPDATE_SERVER \
-    --variable dns_update_keyname=$DNS_UPDATE_KEYNAME \
-    --variable dns_update_keyalgorithm=$DNS_UPDATE_KEYALGORITHM \
+    --variable pdns_account=$PDNS_ACCOUNT \
+    --variable pdns_api_url=$PDNS_API_URL \
+    --variable pdns_api_key=$PDNS_API_KEY \
+    --variable ingress_ip=$INGRESS_IP \
+    --variable pdns_api_url=$PDNS_API_URL \
+    --variable pdns_account=$PDNS_ACCOUNT \
+    --variable dns_update_server=$PDNS_SERVER \
+    --variable dns_update_keyname=$PDNS_TSIG_KEYNAME \
+    --variable dns_update_keyalgorithm=$PDNS_TSIG_ALGO \
+    --variable dns_update_keysecret=$PDNS_TSIG_KEY \
     --variable default_git_url=$DEFAULT_GIT_URL \
     --variable default_org_url=$DEFAULT_ORG_URL \
     --variable default_container_image=$DEFAULT_CONTAINER_IMAGE \
-    $CODER_TEMPLATE_NAME
+    $CODER_TEMPLATE_NAME \
+    --message "$USER iipod Template at $(date)"
 #+end_src
+    # \
+    #--name "foo-bar-baz-`date +%T`"
 * workspace
 ** cd to iipod folder
 #+begin_src tmux
@@ -166,15 +167,11 @@ env | grep "DEFAULT_" | sort
 
 #+RESULTS:
 #+begin_src shell
-CODER_SSH_FORWARD_AGENT=true
-CODER_SSH_FORWARD_GPG=false
-CODER_SSH_NO_WAIT=true
-CODER_SSH_WAIT=no
 CODER_TEMPLATE_NAME=iipod
 CODER_WORKSPACE_STOP_AFTER=96h
-DEFAULT_CONTAINER_IMAGE=ghcr.io/ii/iipod:2023.07.31-01
+DEFAULT_CONTAINER_IMAGE=ghcr.io/ii/iipod:2024.01.18-02
 DEFAULT_GIT_URL=https://github.com/ii/iipod
-DEFAULT_ORG_URL=https://raw.githubusercontent.com/ii/iipod/vcluster/docs/vcluster.org
+DEFAULT_ORG_URL=https://raw.githubusercontent.com/ii/iipod/canon/org/vcluster.org
 #+end_src
 
 ** coder create with parameters
@@ -183,7 +180,7 @@ cd ~/iipod
 # These three vars are picked up by coder create
 # export CODER_CONFIG_DIR=~/.config/space.cloudnative.nz
 source .envrc
-export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
+# export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
 export CODER_TEMPLATE_NAME=iipod
 export CODER_WORKSPACE_STOP_AFTER=8h
 # SPACENAME is in the form fri0838
@@ -193,6 +190,8 @@ time coder create \
     --parameter container-image=$DEFAULT_CONTAINER_IMAGE \
     --parameter git-url=$DEFAULT_GIT_URL \
     --parameter org-url=$DEFAULT_ORG \
+    --parameter cpu=32 \
+    --parameter memory=64 \
     --yes $SPACENAME
 #+end_src
 ** older
