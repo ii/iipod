@@ -9,9 +9,8 @@ ORGFILE=$(basename "$ORGFILE_URL")
 echo "Starting TMUX session: $SPACE_NAME:iipod"
 tmux new -d -s $SPACENAME -n "iipod"
 tmux send-keys -t "$SPACENAME:iipod" "
-git clone $GIT_REPO
-cd $REPO_DIR
 wget $ORGFILE_URL
+git clone $GIT_REPO
 # ensure we can git push via ssh
 mkdir -p ~/.ssh
 ssh-keyscan -H github.com >>~/.ssh/known_hosts
@@ -22,7 +21,6 @@ echo "Starting TMUX session: $SPACE_NAME:emacs"
 tmux new-window -d -t $SPACENAME -n "emacs"
 tmux send-keys -t "$SPACENAME:emacs" "
 sleep 15
-cd $REPO_DIR
 emacsclient -nw $ORGFILE
 "
 

@@ -11,8 +11,8 @@ data "coder_workspace" "ii" {
 #   id = "github"
 # }
 
-data "coder_external_auth" "primary-github" {
-  id = "primary-github"
+data "coder_external_auth" "github" {
+  id = "github"
 }
 
 # Can be set via TF_VAR_variable_name in the coder process ENV
@@ -52,6 +52,13 @@ variable "coder_domain" {
     condition     = can(regex("(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]", var.coder_domain))
     error_message = "Invalid input, must be a valid domain name."
   }
+}
+
+variable "openai_api_token" {
+  type        = string
+  description = "OpenAI API Token"
+  # default     = "example.com"
+  nullable = true
 }
 
 variable "pdns_api_key" {

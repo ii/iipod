@@ -134,6 +134,7 @@ coder template push \
     --directory . \
     --variable coder_url=$CODER_URL \
     --variable coder_domain=$CODER_DOMAIN \
+    --variable openai_api_token=$OPENAI_API_TOKEN \
     --variable pdns_account=$PDNS_ACCOUNT \
     --variable pdns_api_url=$PDNS_API_URL \
     --variable pdns_api_key=$PDNS_API_KEY \
