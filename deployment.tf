@@ -18,21 +18,22 @@ resource "coder_metadata" "iipod" {
   # but apparently only a limited set of markdown/html
   #       allowedElements={["p", "em", "strong", "a", "pre", "code"]}
   # https://github.com/coder/coder/pull/10521/files#diff-cbc535e52cef85ed2f3d7ec9ba042a35c692c7bb50a6077d9df1dd0e6d14a752R147
+  # Hoping appending (:target=_blank) will work
   item {
     key   = "emacs"
-    value = "[emacs-${local.space_domain}](https://emacs-${local.space_domain}/)"
+    value = "[emacs-${local.space_domain}](https://emacs-${local.space_domain}/)(:target=_blank)"
   }
   item {
     key   = "tmux"
-    value = "[tmux-${local.space_domain}](https://tmux-${local.space_domain}/)"
+    value = "[tmux-${local.space_domain}](https://tmux-${local.space_domain}/)(:target=_blank)"
   }
   item {
     key   = "vnc"
-    value = "[vnc-${local.space_domain}](https://vnc-${local.space_domain}/?autoconnect=true&resize=remote)"
+    value = "[vnc-${local.space_domain}](https://vnc-${local.space_domain}/?autoconnect=true&resize=remote)(:target=_blank)"
   }
   item {
     key   = "www"
-    value = "[www-${local.space_domain}](https://tmux-${local.space_domain}/)"
+    value = "[www-${local.space_domain}](https://tmux-${local.space_domain}/)(:target=_blank)"
   }
 }
 
