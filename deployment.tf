@@ -28,7 +28,7 @@ resource "coder_metadata" "iipod" {
   }
   item {
     key   = "vnc"
-    value = "[vnc-${local.space_domain}](https://vnc-${local.space_domain}/)"
+    value = "[vnc-${local.space_domain}](https://vnc-${local.space_domain}/?autoconnect=true&resize=remote)"
   }
   item {
     key   = "www"
