@@ -15,21 +15,22 @@ resource "coder_metadata" "iipod" {
   #   value = "ssh -tA ii@${powerdns_record.a_record.name} kubectl exec -ti iipod-0 -- tmux at"
   # }
   # These can now be markdown : https://github.com/coder/coder/pull/10521
+  # Using HTML anchor with target="_blank" to open in new window.
   item {
     key   = "emacs"
-    value = "[emacs-${local.space_domain}](https://emacs-${local.space_domain}/)"
+    value = "<a href=https://emacs-${local.space_domain}/ target="_blank">emacs-${local.space_domain}</a>"
   }
   item {
     key   = "tmux"
-    value = "[tmux-${local.space_domain}](https://tmux-${local.space_domain}/)"
+    value = "<a href=https://tmux-${local.space_domain}/ target="_blank">tmux-${local.space_domain}</a>"
   }
   item {
     key   = "vnc"
-    value = "[vnc-${local.space_domain}](https://vnc-${local.space_domain}/)"
+    value = "<a href=https://vnc-${local.space_domain}/ target="_blank">vnc-${local.space_domain}</a>"
   }
   item {
     key   = "www"
-    value = "[www-${local.space_domain}](https://tmux-${local.space_domain}/)"
+    value = "<a href=https://www-${local.space_domain}/ target="_blank">www-${local.space_domain}</a>"
   }
 }
 
