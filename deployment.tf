@@ -14,21 +14,22 @@ resource "coder_metadata" "iipod" {
   #   key   = "ssh"
   #   value = "ssh -tA ii@${powerdns_record.a_record.name} kubectl exec -ti iipod-0 -- tmux at"
   # }
+  # These can now be markdown : https://github.com/coder/coder/pull/10521
   item {
     key   = "emacs"
-    value = "https://emacs-${local.space_domain}/"
+    value = "[emacs-${local.space_domain}](https://emacs-${local.space_domain}/)"
   }
   item {
     key   = "tmux"
-    value = "https://tmux-${local.space_domain}/"
+    value = "[tmux-${local.space_domain}](https://tmux-${local.space_domain}/)"
   }
   item {
     key   = "vnc"
-    value = "https://vnc-${local.space_domain}/"
+    value = "[vnc-${local.space_domain}](https://vnc-${local.space_domain}/)"
   }
   item {
     key   = "www"
-    value = "https://www-${local.space_domain}/"
+    value = "[www-${local.space_domain}](https://tmux-${local.space_domain}/)"
   }
 }
 
