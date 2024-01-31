@@ -18,19 +18,19 @@ resource "coder_metadata" "iipod" {
   # Using HTML anchor with target="_blank" to open in new window.
   item {
     key   = "emacs"
-    value = "<a href=https://emacs-${local.space_domain}/ target="_blank">emacs-${local.space_domain}</a>"
+    value = "<a href=https://emacs-${local.space_domain}/ target=_blank>emacs-${local.space_domain}</a>"
   }
   item {
     key   = "tmux"
-    value = "<a href=https://tmux-${local.space_domain}/ target="_blank">tmux-${local.space_domain}</a>"
+    value = "<a href=https://tmux-${local.space_domain}/ target=_blank>tmux-${local.space_domain}</a>"
   }
   item {
     key   = "vnc"
-    value = "<a href=https://vnc-${local.space_domain}/ target="_blank">vnc-${local.space_domain}</a>"
+    value = "<a href=https://vnc-${local.space_domain}/ target=_blank>vnc-${local.space_domain}</a>"
   }
   item {
     key   = "www"
-    value = "<a href=https://www-${local.space_domain}/ target="_blank">www-${local.space_domain}</a>"
+    value = "<a href=https://www-${local.space_domain}/ target=_blank>www-${local.space_domain}</a>"
   }
 }
 
