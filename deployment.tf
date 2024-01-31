@@ -15,22 +15,24 @@ resource "coder_metadata" "iipod" {
   #   value = "ssh -tA ii@${powerdns_record.a_record.name} kubectl exec -ti iipod-0 -- tmux at"
   # }
   # These can now be markdown : https://github.com/coder/coder/pull/10521
-  # Using HTML anchor with target="_blank" to open in new window.
+  # but apparently only a limited set of markdown/html
+  #       allowedElements={["p", "em", "strong", "a", "pre", "code"]}
+  # https://github.com/coder/coder/pull/10521/files#diff-cbc535e52cef85ed2f3d7ec9ba042a35c692c7bb50a6077d9df1dd0e6d14a752R147
   item {
     key   = "emacs"
-    value = "<a href=https://emacs-${local.space_domain}/ target=_blank>emacs-${local.space_domain}</a>"
+    value = "[emacs-${local.space_domain}](https://emacs-${local.space_domain}/)"
   }
   item {
     key   = "tmux"
-    value = "<a href=https://tmux-${local.space_domain}/ target=_blank>tmux-${local.space_domain}</a>"
+    value = "[tmux-${local.space_domain}](https://tmux-${local.space_domain}/)"
   }
   item {
     key   = "vnc"
-    value = "<a href=https://vnc-${local.space_domain}/ target=_blank>vnc-${local.space_domain}</a>"
+    value = "[vnc-${local.space_domain}](https://vnc-${local.space_domain}/)"
   }
   item {
     key   = "www"
-    value = "<a href=https://www-${local.space_domain}/ target=_blank>www-${local.space_domain}</a>"
+    value = "[www-${local.space_domain}](https://tmux-${local.space_domain}/)"
   }
 }
 
