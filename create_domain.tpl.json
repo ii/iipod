@@ -9,7 +9,7 @@
       "name": "*.${DOMAIN}",
       "type": "A",
       "ttl": 60,
-      "records": [{ "content": "${IP}" }]
+      "records": [{ "content": "${INGRESS_IP}" }]
     }
   ],
   "comments": [

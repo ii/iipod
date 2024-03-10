@@ -4,10 +4,16 @@ data "coder_provisioner" "ii" {
 data "coder_workspace" "ii" {
 }
 
+# Warning: Deprecated Resource
+# on vars.tf line 7, in data "coder_git_auth" "github":
 # data "coder_git_auth" "github" {
 #   # Matches the ID of the git auth provider in Coder.
-#   id = "primary-github"
+#   id = "github"
 # }
+
+data "coder_external_auth" "github" {
+  id = "github"
+}
 
 # Can be set via TF_VAR_variable_name in the coder process ENV
 # But can also be set via a file similar var/space.sharing.io.yaml
@@ -46,6 +52,13 @@ variable "coder_domain" {
     condition     = can(regex("(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]", var.coder_domain))
     error_message = "Invalid input, must be a valid domain name."
   }
+}
+
+variable "openai_api_token" {
+  type        = string
+  description = "OpenAI API Token"
+  # default     = "example.com"
+  nullable = true
 }
 
 variable "pdns_api_key" {
@@ -135,22 +148,22 @@ variable "default_org_url" {
   }
 }
 
-variable "local_ip" {
+variable "ingress_ip" {
   type        = string
   description = "Local LB IP"
   nullable    = false
   validation {
-    condition     = can(cidrhost("${var.local_ip}/32", 0))
+    condition     = can(cidrhost("${var.ingress_ip}/32", 0))
     error_message = "Must be valid IP Address"
   }
 
 }
-variable "public_ip" {
-  type        = string
-  description = "Public IP"
-  nullable    = false
-  validation {
-    condition     = can(cidrhost("${var.public_ip}/32", 0))
-    error_message = "Must be valid IP Address"
-  }
-}
+# variable "public_ip" {
+#   type        = string
+#   description = "Public IP"
+#   nullable    = false
+#   validation {
+#     condition     = can(cidrhost("${var.public_ip}/32", 0))
+#     error_message = "Must be valid IP Address"
+#   }
+# }
