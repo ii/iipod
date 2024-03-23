@@ -11,6 +11,7 @@ tmux new -d -s "$SPACENAME" -n "iipod"
 tmux send-keys -t "$SPACENAME:iipod" "
 wget "$ORGFILE_URL"
 git clone "$GIT_REPO"
+cd "$REPO_DIR"
 # ensure we can git push via ssh
 mkdir -p ~/.ssh
 ssh-keyscan -H github.com >>~/.ssh/known_hosts
