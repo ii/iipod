@@ -2,26 +2,26 @@
 set -x
 
 # Caclulate vars needod for REPO and ORGFILE
-REPO_DIR=$(basename $GIT_REPO | sed 's:.git$::')
-GIT_REPO_SSH=$(echo $GIT_REPO | sed 'sXhttps://Xgit@X' | sed 'sX/X:X')
-ORGFILE=$(basename "$ORGFILE_URL")
+REPO_DIR="$(basename "$GIT_REPO" | sed 's:.git$::')"
+GIT_REPO_SSH="$(echo "$GIT_REPO" | sed 'sXhttps://Xgit@X' | sed 'sX/X:X')
+ORGFILE="$(basename "$ORGFILE_URL")"
 
 echo "Starting TMUX session: $SPACE_NAME:iipod"
-tmux new -d -s $SPACENAME -n "iipod"
+tmux new -d -s "$SPACENAME" -n "iipod"
 tmux send-keys -t "$SPACENAME:iipod" "
-wget $ORGFILE_URL
-git clone $GIT_REPO
+wget "$ORGFILE_URL"
+git clone "$GIT_REPO"
 # ensure we can git push via ssh
 mkdir -p ~/.ssh
 ssh-keyscan -H github.com >>~/.ssh/known_hosts
-git remote add ssh $GIT_REPO_SSH
+git remote add ssh "$GIT_REPO_SSH"
 "
 
 echo "Starting TMUX session: $SPACE_NAME:emacs"
-tmux new-window -d -t $SPACENAME -n "emacs"
+tmux new-window -d -t "$SPACENAME" -n "emacs"
 tmux send-keys -t "$SPACENAME:emacs" "
 sleep 15
-emacsclient -nw $ORGFILE
+emacsclient -nw "$ORGFILE"
 "
 
 echo "Starting TMUX session: servers:ii"
@@ -33,7 +33,7 @@ echo These windows contain the services supporting your iipod
 echo "Starting TMUX session: servers:ttyd"
 tmux new-window -d -t "servers" -n "ttyd"
 tmux send-keys -t "servers:ttyd" "
-ttyd --writable tmux at -t $SPACENAME
+ttyd --writable tmux at -t "$SPACENAME"
 "
 
 echo "Starting TMUX session: servers:web-server"
@@ -59,7 +59,7 @@ tmux new-window -d -t "servers" -n "emacs-pgtk"
 tmux send-keys -t "servers:emacs-pgtk" "
 export GDK_BACKEND=broadway
 export BROADWAY_DISPLAY=:5
-emacs $ORGFILE
+emacs "$ORGFILE"
 "
 
 echo "Starting TMUX session: servers:novnc"
@@ -76,7 +76,7 @@ tmux new-window -d -t "servers" -n "tigervnc"
 tmux send-keys -t "tigervnc" "
 unset GDK_BACKEND # must not be set when using X
 export PATH=/usr/local/stow/emacs-x/bin:$PATH
-tigervncserver :1 -desktop $SESSION_NAME -SecurityTypes None -xstartup startplasma-x11
+tigervncserver :1 -desktop "$SESSION_NAME" -SecurityTypes None -xstartup startplasma-x11
 export DISPLAY=:1
 setterm blank 0
 setterm powerdown 0
