@@ -1,0 +1,95 @@
+name: build
+on:
+  push: {}
+  release:
+    types: [published]
+  workflow_dispatch: {}
+permissions:
+  packages: write
+  contents: write
+  pull-requests: write
+  id-token: write
+  security-events: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: sigstore/cosign-installer@4959ce089c160fddf62f7b42464195ba1a56d382 # v3.6.0
+      - uses: imjasonh/setup-crane@31b88efe9de28ae0ffa220711af4b60be9435f6e # v0.4
+      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@49b3bc8e6bdd4a60e6116a5414239cba5943d3cf # v3.2.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8026d2bc3645ea78b0d2544766a1225eb5691f89 # v3.7.0
+      - name: Login to ghcr.io
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: run-info
+        name: collect job run info
+        env:
+          GHCR_DOCKER_REPO: ghcr.io/${{ github.repository }}
+        run: |
+          TAGS="latest,$(git show -s --format=%cd --date=format:'%Y.%m.%d.%H%M')"
+          REGISTRY="${GHCR_DOCKER_REPO,,}"
+          [ -z "$REGISTRY_OVERRIDE" ] || REGISTRY="$REGISTRY_OVERRIDE"
+          IMAGES_WITH_TAGS=""
+          for TAG in $(echo $TAGS | tr ',' ' '); do
+            NEW_TAG="$REGISTRY:$TAG"
+            if [ -n "$IMAGES_WITH_TAGS" ]; then
+              IMAGES_WITH_TAGS="$NEW_TAG,$IMAGES_WITH_TAGS"
+            else
+              IMAGES_WITH_TAGS="$NEW_TAG"
+            fi
+          done
+          echo "image=$REGISTRY" >> $GITHUB_OUTPUT
+          echo "images-with-tags=$IMAGES_WITH_TAGS" >> $GITHUB_OUTPUT
+      - name: Build and push
+        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75 # v6.9.0
+        id: build
+        with:
+          push: true
+          tags: ${{ steps.run-info.outputs.images-with-tags }}
+          context: build
+          platforms: linux/amd64
+          file: build/Dockerfile
+          labels: |
+            org.opencontainers.image.name=${{ steps.run-info.outputs.image }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.repositoryUrl }}
+      - name: get-digests
+        id: get-digests
+        env:
+          DESTINATION: ${{ steps.run-info.outputs.image }}@${{ steps.build.outputs.digest }}
+        run: |
+          DESTINATION_DIGEST="$(crane digest "${DESTINATION}" || true)"
+          (
+            echo "DESTINATION_DIGEST"
+            echo "${DESTINATION_DIGEST}"
+          ) | column -t
+          echo "destination=${DESTINATION_DIGEST}" >> $GITHUB_OUTPUT
+      - name: Sign image
+        env:
+          COSIGN_YES: "true"
+        run: |
+          cosign sign ${{ steps.run-info.outputs.image }}@${{ steps.get-digests.outputs.destination }} -y --recursive
+      - uses: anchore/sbom-action@61119d458adab75f756bc0b9e4bde25725f86a7a # v0.17.2
+        with:
+          image: ${{ steps.run-info.outputs.image }}@${{ steps.get-digests.outputs.destination }}
+          artifact-name: sbom-spdx.json
+          output-file: /tmp/sbom-spdx.json
+      - name: publish sbom blob as blob
+        env:
+          COSIGN_YES: "true"
+        run: |
+          cosign attest --predicate /tmp/sbom-spdx.json ${{ steps.run-info.outputs.image }}@${{ steps.get-digests.outputs.destination }} --recursive
+      - name: image
+        id: image
+        run: |
+          echo "image=${{ steps.run-info.outputs.image }}@${{ steps.get-digests.outputs.destination }}" >> $GITHUB_OUTPUT
+      - name: image result
+        id: result
+        run: |
+          echo "Build, pushed and signed: ${{ steps.image.outputs.image }}"
