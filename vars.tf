@@ -75,7 +75,7 @@ variable "pdns_api_url" {
   nullable = false
 }
 
-variable "pdns_account" {
+variable "pdns_api_account" {
   type        = string
   description = "PowerDNS Account to associate user domain to"
   nullable    = false

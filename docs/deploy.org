@@ -133,18 +133,16 @@ coder template push \
     --yes \
     --directory . \
     --variable coder_url=$CODER_URL \
+    --variable ingress_ip=$INGRESS_IP \
     --variable coder_domain=$CODER_DOMAIN \
     --variable openai_api_token=$OPENAI_API_TOKEN \
-    --variable pdns_account=$PDNS_ACCOUNT \
     --variable pdns_api_url=$PDNS_API_URL \
     --variable pdns_api_key=$PDNS_API_KEY \
-    --variable ingress_ip=$INGRESS_IP \
-    --variable pdns_api_url=$PDNS_API_URL \
-    --variable pdns_account=$PDNS_ACCOUNT \
-    --variable dns_update_server=$PDNS_SERVER \
-    --variable dns_update_keyname=$PDNS_TSIG_KEYNAME \
-    --variable dns_update_keyalgorithm=$PDNS_TSIG_ALGO \
-    --variable dns_update_keysecret=$PDNS_TSIG_KEY \
+    --variable pdns_api_account=$PDNS_API_ACCOUNT \
+    --variable dns_update_server=$DNS_UPDATE_SERVER \
+    --variable dns_update_keyname=$DNS_UPDATE_KEYNAME \
+    --variable dns_update_keyalgorithm=$DNS_UPDATE_KEYALGORITHM \
+    --variable dns_update_keysecret=$DNS_UPDATE_KEYSECRET \
     --variable default_git_url=$DEFAULT_GIT_URL \
     --variable default_org_url=$DEFAULT_ORG_URL \
     --variable default_container_image=$DEFAULT_CONTAINER_IMAGE \
@@ -191,8 +189,8 @@ time coder create \
     --parameter container-image=$DEFAULT_CONTAINER_IMAGE \
     --parameter git-url=$DEFAULT_GIT_URL \
     --parameter org-url=$DEFAULT_ORG \
-    --parameter cpu=32 \
-    --parameter memory=64 \
+    --parameter cpu=4 \
+    --parameter memory=16 \
     --yes $SPACENAME
 #+end_src
 ** older

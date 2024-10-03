@@ -39,7 +39,7 @@ curl -L -s \
     DOMAIN = "${local.user_domain}.",
     NS1    = "ns.ii.nz",
     NS2    = "ns2.ii.nz",
-    ACCOUNTNAME : "${var.pdns_account}",
+    ACCOUNTNAME : "${var.pdns_api_account}",
     KEYNAME : "${var.dns_update_keyname}",
     INGRESS_IP : "${var.ingress_ip}"
 })}' ${var.pdns_api_url}/api/v1/servers/localhost/zones
@@ -67,7 +67,7 @@ curl -L -s \
   DOMAIN = "${local.spacename}.${local.user_domain}.",
   NS1    = "ns.ii.nz",
   NS2    = "ns2.ii.nz",
-  ACCOUNTNAME : "${var.pdns_account}",
+  ACCOUNTNAME : "${var.pdns_api_account}",
   KEYNAME : "${var.dns_update_keyname}",
   INGRESS_IP : "${var.ingress_ip}"
 })}' ${var.pdns_api_url}/api/v1/servers/localhost/zones

@@ -89,7 +89,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
     kitty \
     plasma-desktop \
     dbus-x11 \
-    firefox-esr \
     websockify \
     code \
     cmake \
@@ -100,6 +99,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
     openjdk-17-jdk \
 	&& ln -s /usr/bin/fdfind /usr/local/bin/fd \
 	&& rm -rf /var/lib/apt/lists/*
+    # firefox-esr \
     # ubuntu-desktop \
     # libgccjit-13-dev \
     # libgtk-3-bin \
