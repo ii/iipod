@@ -12,7 +12,7 @@ resource "coder_agent" "iipod" {
   shutdown_script_timeout = 300
   env = {
     # GITHUB_TOKEN = "$${data.coder_git_auth.github.access_token}"
-    GITHUB_TOKEN = "${data.coder_external_auth.github.access_token}"
+    # GITHUB_TOKEN = "${data.coder_external_auth.github.access_token}"
     # Just a hidden feature for now to try out
     OPENAI_API_TOKEN    = "${var.openai_api_token}"
     ORGFILE_URL         = "${data.coder_parameter.org-url.value}"
