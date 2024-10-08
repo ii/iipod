@@ -11,9 +11,9 @@ data "coder_workspace" "ii" {
 #   id = "github"
 # }
 
-data "coder_external_auth" "github" {
-  id = "github"
-}
+# data "coder_external_auth" "github" {
+#   id = "github"
+# }
 
 # Can be set via TF_VAR_variable_name in the coder process ENV
 # But can also be set via a file similar var/space.sharing.io.yaml
@@ -108,6 +108,20 @@ variable "dns_update_keyalgorithm" {
 variable "dns_update_keysecret" {
   type        = string
   description = "TSIG Key Secret for RFC2136 Updates"
+  nullable    = false
+  # sensitive   = true
+}
+variable "container_resource_cpu" {
+  type        = number
+  description = "the strict amount of CPU to provide"
+  default     = "4"
+  nullable    = false
+  # sensitive   = true
+}
+variable "container_resource_memory" {
+  type        = number
+  description = "the strict amount of memory to provide in gigabytes"
+  default     = "8"
   nullable    = false
   # sensitive   = true
 }

@@ -98,12 +98,14 @@ resource "kubernetes_deployment" "iipod" {
           }
           resources {
             requests = {
-              "cpu"    = "250m"
-              "memory" = "512Mi"
+              # "cpu"    = "250m"
+              # "memory" = "512Mi"
+              "cpu"    = "${var.container_resource_cpu / 2}"
+              "memory" = "${var.container_resource_memory / 2}Gi"
             }
             limits = {
-              "cpu"    = "${data.coder_parameter.cpu.value}"
-              "memory" = "${data.coder_parameter.memory.value}Gi"
+              "cpu"    = var.container_resource_cpu
+              "memory" = "${var.container_resource_memory}Gi"
             }
           }
           env {
