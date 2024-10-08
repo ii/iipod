@@ -43,16 +43,16 @@ spec:
                   number: 80
             path: /
             pathType: ImplementationSpecific
-    - host: emacs.${spacename}.${username}.${coder_domain}
-      http:
-        paths:
-          - backend:
-              service:
-                name: emacs-${spacename}
-                port:
-                  number: 80
-            path: /
-            pathType: ImplementationSpecific
+    # - host: emacs.${spacename}.${username}.${coder_domain}
+    #   http:
+    #     paths:
+    #       - backend:
+    #           service:
+    #             name: emacs-${spacename}
+    #             port:
+    #               number: 80
+    #         path: /
+    #         pathType: ImplementationSpecific
   tls:
     # - hosts:
     #     - emacs-${spacename}-${username}.${coder_domain}
@@ -60,6 +60,6 @@ spec:
     - hosts:
         - emacs-${spacename}.${username}.${coder_domain}
       secretName: wildcard-tls
-    - hosts:
-        - emacs.${spacename}.${username}.${coder_domain}
-      secretName: ${spacename}-wildcard-tls
+    # - hosts:
+    #     - emacs.${spacename}.${username}.${coder_domain}
+    #   secretName: ${spacename}-wildcard-tls

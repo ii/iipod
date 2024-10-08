@@ -38,21 +38,21 @@ spec:
         paths:
           - backend:
               service:
-                name: ttyd-${spacename}
+                name: left-${spacename}
                 port:
                   number: 80
             path: /
             pathType: ImplementationSpecific
-    - host: left.${spacename}.${username}.${coder_domain}
-      http:
-        paths:
-          - backend:
-              service:
-                name: ttyd-${spacename}
-                port:
-                  number: 80
-            path: /
-            pathType: ImplementationSpecific
+    # - host: left.${spacename}.${username}.${coder_domain}
+    #   http:
+    #     paths:
+    #       - backend:
+    #           service:
+    #             name: ttyd-${spacename}
+    #             port:
+    #               number: 80
+    #         path: /
+    #         pathType: ImplementationSpecific
   tls:
     # - hosts:
     #     - left-${spacename}-${username}.${coder_domain}
@@ -60,6 +60,6 @@ spec:
     - hosts:
         - left-${spacename}.${username}.${coder_domain}
       secretName: wildcard-tls
-    - hosts:
-        - left.${spacename}.${username}.${coder_domain}
-      secretName: ${spacename}-wildcard-tls
+    # - hosts:
+    #     - left.${spacename}.${username}.${coder_domain}
+    #   secretName: ${spacename}-wildcard-tls

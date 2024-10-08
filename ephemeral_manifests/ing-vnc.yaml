@@ -42,16 +42,16 @@ spec:
                   number: 80
             path: /
             pathType: ImplementationSpecific
-    - host: vnc.${spacename}.${username}.${coder_domain}
-      http:
-        paths:
-          - backend:
-              service:
-                name: novnc-${spacename}
-                port:
-                  number: 80
-            path: /
-            pathType: ImplementationSpecific
+    # - host: vnc.${spacename}.${username}.${coder_domain}
+    #   http:
+    #     paths:
+    #       - backend:
+    #           service:
+    #             name: novnc-${spacename}
+    #             port:
+    #               number: 80
+    #         path: /
+    #         pathType: ImplementationSpecific
   tls:
     # - hosts:
     #     - vnc-${spacename}-${username}.${coder_domain}
@@ -59,6 +59,6 @@ spec:
     - hosts:
         - vnc-${spacename}.${username}.${coder_domain}
       secretName: wildcard-tls
-    - hosts:
-        - vnc.${spacename}.${username}.${coder_domain}
-      secretName: ${spacename}-wildcard-tls
+    # - hosts:
+    #     - vnc.${spacename}.${username}.${coder_domain}
+    #   secretName: ${spacename}-wildcard-tls
