@@ -75,7 +75,7 @@ variable "pdns_api_url" {
   nullable = false
 }
 
-variable "pdns_api_account" {
+variable "dns_update_account" {
   type        = string
   description = "PowerDNS Account to associate user domain to"
   nullable    = false
@@ -162,22 +162,22 @@ variable "default_org_url" {
   }
 }
 
-variable "ingress_ip" {
-  type        = string
-  description = "Local LB IP"
-  nullable    = false
-  validation {
-    condition     = can(cidrhost("${var.ingress_ip}/32", 0))
-    error_message = "Must be valid IP Address"
-  }
-
-}
-# variable "public_ip" {
+# variable "ingress_ip" {
 #   type        = string
-#   description = "Public IP"
+#   description = "Local LB IP"
 #   nullable    = false
 #   validation {
-#     condition     = can(cidrhost("${var.public_ip}/32", 0))
+#     condition     = can(cidrhost("${var.ingress_ip}/32", 0))
 #     error_message = "Must be valid IP Address"
 #   }
+
 # }
+variable "public_ip" {
+  type        = string
+  description = "Public IP"
+  nullable    = false
+  validation {
+    condition     = can(cidrhost("${var.public_ip}/32", 0))
+    error_message = "Must be valid IP Address"
+  }
+}

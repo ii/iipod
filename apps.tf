@@ -10,11 +10,22 @@ resource "coder_app" "Emacs" {
 }
 
 # ttyd
-resource "coder_app" "tmux" {
+resource "coder_app" "left-tmux" {
   subdomain    = true
   share        = "public"
-  slug         = "tmux"
-  display_name = "tmux"
+  slug         = "left-tmux"
+  display_name = "left eye/tmux"
+  icon         = "https://cdn.icon-icons.com/icons2/2148/PNG/512/tmux_icon_131831.png"
+  agent_id     = coder_agent.iipod.id
+  url          = "http://localhost:7680" # 7681 is the default ttyd port, which calls 'tmux at -s $SPACENAME'
+}
+
+# ttyd
+resource "coder_app" "right-tmux" {
+  subdomain    = true
+  share        = "public"
+  slug         = "right-tmux"
+  display_name = "right eye/tmux"
   icon         = "https://cdn.icon-icons.com/icons2/2148/PNG/512/tmux_icon_131831.png"
   agent_id     = coder_agent.iipod.id
   url          = "http://localhost:7681" # 7681 is the default ttyd port, which calls 'tmux at -s $SPACENAME'

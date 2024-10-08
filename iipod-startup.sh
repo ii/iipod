@@ -17,22 +17,28 @@ ssh-keyscan -H github.com >>~/.ssh/known_hosts
 git remote add ssh $GIT_REPO_SSH
 "
 
-echo "Starting TMUX session: $SPACE_NAME:emacs"
-tmux new-window -d -t $SPACENAME -n "emacs"
-tmux send-keys -t "$SPACENAME:emacs" "
-sleep 15
-emacsclient -nw $ORGFILE
-"
-
 echo "Starting TMUX session: servers:ii"
 tmux new -d -s "servers" -n ii
 tmux send-keys -t "servers:ii" "
 echo These windows contain the services supporting your iipod
 "
 
-echo "Starting TMUX session: servers:ttyd"
-tmux new-window -d -t "servers" -n "ttyd"
-tmux send-keys -t "servers:ttyd" "
+echo "Starting TMUX session: servers:emacs"
+tmux new-window -d -t servers -n "emacs"
+tmux send-keys -t "servers:emacs" "
+sleep 15
+emacsclient -nw $ORGFILE
+"
+
+echo "Starting TMUX session: servers:left-ttyd"
+tmux new-window -d -t "servers" -n "left-ttyd"
+tmux send-keys -t "servers:left-ttyd" "
+ttyd --writable -p 7680 tmux at -t servers
+"
+
+echo "Starting TMUX session: servers:right-ttyd"
+tmux new-window -d -t "servers" -n "right-ttyd"
+tmux send-keys -t "servers:right-ttyd" "
 ttyd --writable tmux at -t $SPACENAME
 "
 

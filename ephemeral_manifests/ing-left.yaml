@@ -1,9 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: vnc-${spacename}
+  name: left-${spacename}
   namespace: ${namespace}
   labels:
+    spaceapp: left
     spacename: ${spacename}
   annotations:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
@@ -22,43 +23,43 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    # - host: vnc-${spacename}-${username}.${coder_domain}
+    # - host: left-${spacename}-${username}.${coder_domain}
     #   http:
     #     paths:
     #       - backend:
     #           service:
-    #             name: novnc-${spacename}
+    #             name: ttyd-${spacename}
     #             port:
     #               number: 80
     #         path: /
     #         pathType: ImplementationSpecific
-    - host: vnc-${spacename}.${username}.${coder_domain}
+    - host: left-${spacename}.${username}.${coder_domain}
       http:
         paths:
           - backend:
               service:
-                name: novnc-${spacename}
+                name: ttyd-${spacename}
                 port:
                   number: 80
             path: /
             pathType: ImplementationSpecific
-    - host: vnc.${spacename}.${username}.${coder_domain}
+    - host: left.${spacename}.${username}.${coder_domain}
       http:
         paths:
           - backend:
               service:
-                name: novnc-${spacename}
+                name: ttyd-${spacename}
                 port:
                   number: 80
             path: /
             pathType: ImplementationSpecific
   tls:
     # - hosts:
-    #     - vnc-${spacename}-${username}.${coder_domain}
+    #     - left-${spacename}-${username}.${coder_domain}
     #   # This one uses the default cert
     - hosts:
-        - vnc-${spacename}.${username}.${coder_domain}
+        - left-${spacename}.${username}.${coder_domain}
       secretName: wildcard-tls
     - hosts:
-        - vnc.${spacename}.${username}.${coder_domain}
+        - left.${spacename}.${username}.${coder_domain}
       secretName: ${spacename}-wildcard-tls

@@ -18,22 +18,31 @@ resource "coder_metadata" "iipod" {
   # but apparently only a limited set of markdown/html
   #       allowedElements={["p", "em", "strong", "a", "pre", "code"]}
   # https://github.com/coder/coder/pull/10521/files#diff-cbc535e52cef85ed2f3d7ec9ba042a35c692c7bb50a6077d9df1dd0e6d14a752R147
-  item {
-    key   = "emacs"
-    value = "[emacs-${local.space_domain}](https://emacs-${local.space_domain}/)"
-  }
-  item {
-    key   = "tmux"
-    value = "[tmux-${local.space_domain}](https://tmux-${local.space_domain}/)"
-  }
-  item {
-    key   = "vnc"
-    value = "[vnc-${local.space_domain}](https://vnc-${local.space_domain}/?autoconnect=true&resize=remote)"
-  }
-  item {
-    key   = "www"
-    value = "[www-${local.space_domain}](https://tmux-${local.space_domain}/)"
-  }
+  # item {
+  #   key   = "emacs"
+  #   value = "[emacs-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain}](https://emacs-${local.spacename}-${data.coder_workspace.ii.owner}.${var.coder_domain})"
+  #   # value = "[emacs-${local.space_domain}](https://emacs-${local.space_domain}/)"
+  # }
+  # item {
+  #   key   = "left tmux/eye"
+  #   value = "[left-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain}](https://left-${local.spacename}-${data.coder_workspace.ii.owner}.${var.coder_domain})"
+  #   # value = "[lefteye-${local.space_domain}](https://lefteye-${local.space_domain}/)"
+  # }
+  # item {
+  #   key   = "right tmux/eye"
+  #   value = "[right-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain}](https://right-${local.spacename}-${data.coder_workspace.ii.owner}.${var.coder_domain})"
+  #   # value = "[righteye-${local.space_domain}](https://righteye-${local.space_domain}/)"
+  # }
+  # item {
+  #   key   = "vnc"
+  #   value = "[vnc-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain}](https://vnc-${local.spacename}-${data.coder_workspace.ii.owner}.${var.coder_domain}/?autoconnect=true&resize=remote)"
+  #   # value = "[vnc-${emacslocal.space_domain}](https://vnc-${local.space_domain}/?autoconnect=true&resize=remote)"
+  # }
+  # item {
+  #   key   = "www"
+  #   value = "[www-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain}](https://www-${local.spacename}-${data.coder_workspace.ii.owner}.${var.coder_domain})"
+  #   # value = "[www-${local.space_domain}](https://www-${local.space_domain}/)"
+  # }
 }
 
 resource "kubernetes_deployment" "iipod" {

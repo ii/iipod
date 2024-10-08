@@ -91,11 +91,11 @@ ssh -A ii@sharing.io
 #+end_src
 ** CODER_CONFIG_DIR
 #+begin_src tmux
-export CODER_CONFIG_DIR=~/.config/space.cloudnative.nz
+export CODER_CONFIG_DIR=~/.config/coder.sharing.io
 #+end_src
 ** coder login
 #+begin_src tmux
-coder login https://space.cloudnative.nz
+coder login https://coder.sharing.io
 #+end_src
 * template
 :PROPERTIES:
@@ -109,6 +109,9 @@ ssh -A ii@sharing.io
 #+begin_src tmux
 cd ~/iipod
 #+end_src
+
+#+RESULTS:
+
 ** init terraform
 coder now supports speeding things up if you `terraform init` so .terraform.lock.hcl is pushed the template and cached.
 https://github.com/coder/coder/pull/7604/files
@@ -122,10 +125,12 @@ WARN: No .terraform.lock.hcl file found
 #+begin_src tmux
 terraform init
 #+end_src
+
+#+RESULTS:
+
 ** push/create the template with terraform vars
 #+begin_src tmux
-# export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
-export CODER_CONFIG_DIR=~/.config/coder.cloudnative.coop
+export CODER_CONFIG_DIR=~/.config/coder.sharing.io
 export CODER_TEMPLATE_NAME=iipod
 cd ~/iipod
 source .envrc
@@ -133,12 +138,12 @@ coder template push \
     --yes \
     --directory . \
     --variable coder_url=$CODER_URL \
-    --variable ingress_ip=$INGRESS_IP \
+    --variable public_ip=$PUBLIC_IP \
     --variable coder_domain=$CODER_DOMAIN \
     --variable openai_api_token=$OPENAI_API_TOKEN \
     --variable pdns_api_url=$PDNS_API_URL \
     --variable pdns_api_key=$PDNS_API_KEY \
-    --variable pdns_api_account=$PDNS_API_ACCOUNT \
+    --variable dns_update_account=$DNS_UPDATE_ACCOUNT \
     --variable dns_update_server=$DNS_UPDATE_SERVER \
     --variable dns_update_keyname=$DNS_UPDATE_KEYNAME \
     --variable dns_update_keyalgorithm=$DNS_UPDATE_KEYALGORITHM \
@@ -149,6 +154,9 @@ coder template push \
     $CODER_TEMPLATE_NAME \
     --message "$USER iipod Template at $(date)"
 #+end_src
+
+#+RESULTS:
+
     # \
     #--name "foo-bar-baz-`date +%T`"
 * workspace
@@ -167,10 +175,10 @@ env | grep "DEFAULT_" | sort
 #+RESULTS:
 #+begin_src shell
 CODER_TEMPLATE_NAME=iipod
-CODER_WORKSPACE_STOP_AFTER=96h
-DEFAULT_CONTAINER_IMAGE=ghcr.io/ii/iipod:2024.01.18-02
-DEFAULT_GIT_URL=https://github.com/ii/iipod
-DEFAULT_ORG_URL=https://raw.githubusercontent.com/ii/iipod/canon/org/vcluster.org
+CODER_WORKSPACE_STOP_AFTER=7d
+DEFAULT_CONTAINER_IMAGE=ghcr.io/ii/iipod:2024.10.02-01
+DEFAULT_GIT_URL=https://github.com/ii/iipod/
+DEFAULT_ORG_URL=https://raw.githubusercontent.com/ii/iipod/org/vcluster.org
 #+end_src
 
 ** coder create with parameters
@@ -189,8 +197,6 @@ time coder create \
     --parameter container-image=$DEFAULT_CONTAINER_IMAGE \
     --parameter git-url=$DEFAULT_GIT_URL \
     --parameter org-url=$DEFAULT_ORG \
-    --parameter cpu=4 \
-    --parameter memory=16 \
     --yes $SPACENAME
 #+end_src
 ** older
@@ -206,3 +212,4 @@ EOF
 #+begin_src tmux
 echo FOO
 #+end_src
+a

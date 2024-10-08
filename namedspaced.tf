@@ -19,12 +19,10 @@ resource "template_dir" "ephemeral" {
     spacename    = local.spacename
   }
 }
-
-# TODO look at https://registry.terraform.io/providers/kbst/kustomization/latest/docs/resources/resource
 resource "null_resource" "namespace" {
   depends_on = [
     template_dir.persistent,
-    template_dir.ephemeral
+    # template_dir.ephemeral
   ]
   # We want a per user domain USERNAME.DOMAIN.COM
   # We provision wildcard DNS01 certs for *.USERNAME.DOMAIN.COM
@@ -32,18 +30,17 @@ resource "null_resource" "namespace" {
   provisioner "local-exec" {
     quiet = true
     command = <<COMMAND
-curl -L -s \
-  -H 'X-API-Key: ${var.pdns_api_key}' -H 'Content-Type: application/json' \
-  -D - \
-  -d '${templatefile("./create_domain.tpl.json", {
+  curl -L -s \
+    -H 'X-API-Key: ${var.pdns_api_key}' -H 'Content-Type: application/json' \
+    -D - \
+    -d '${templatefile("./create_domain.tpl.json", {
     DOMAIN = "${local.user_domain}.",
-    NS1    = "ns.ii.nz",
-    NS2    = "ns2.ii.nz",
-    ACCOUNTNAME : "${var.pdns_api_account}",
+    NS1    = "ns1.sharing.io",
+    NS2    = "ns2.sharing.io",
     KEYNAME : "${var.dns_update_keyname}",
-    INGRESS_IP : "${var.ingress_ip}"
+    INGRESS_IP : "${var.public_ip}"
 })}' ${var.pdns_api_url}/api/v1/servers/localhost/zones
-COMMAND
+  COMMAND
 }
 provisioner "local-exec" {
   quiet   = true
@@ -57,34 +54,36 @@ COMMAND
 }
 
 ##### this creates a DNS zone per namespace.... this isn't needed yet, but might be useful later on
-provisioner "local-exec" {
-  quiet = true
-  command = <<COMMAND
-curl -L -s \
-  -H 'X-API-Key: ${var.pdns_api_key}' -H 'Content-Type: application/json' \
-  -D - \
-  -d '${templatefile("./create_domain.tpl.json", {
-  DOMAIN = "${local.spacename}.${local.user_domain}.",
-  NS1    = "ns.ii.nz",
-  NS2    = "ns2.ii.nz",
-  ACCOUNTNAME : "${var.pdns_api_account}",
-  KEYNAME : "${var.dns_update_keyname}",
-  INGRESS_IP : "${var.ingress_ip}"
-})}' ${var.pdns_api_url}/api/v1/servers/localhost/zones
-COMMAND
-}
-provisioner "local-exec" {
-  quiet   = true
-  command = <<COMMAND
-curl -L -s \
-  -H 'X-API-Key: ${var.pdns_api_key}' -H 'Content-Type: application/json' \
-  -D - \
-  -d '{"kind": "TSIG-ALLOW-DNSUPDATE", "metadata": ["${var.dns_update_keyname}"]}' \
-  ${var.pdns_api_url}/api/v1/servers/localhost/zones/${local.spacename}.${local.user_domain}/metadata
-COMMAND
-}
+# provisioner "local-exec" {
+#   quiet = true
+#   command = <<COMMAND
+# curl -L -s \
+#   -H 'X-API-Key: ${var.pdns_api_key}' -H 'Content-Type: application/json' \
+#   -D - \
+#   -d '${templatefile("./create_domain.tpl.json", {
+#   DOMAIN = "${local.spacename}.${local.user_domain}.",
+#   NS1    = "ns1.sharing.io",
+#   NS2    = "ns2.sharing.io",
+#   ACCOUNTNAME : "coder",
+#   KEYNAME : "${var.dns_update_keyname}",
+#   INGRESS_IP : "${var.ingress_ip}"
+# })}' ${var.pdns_api_url}/api/v1/servers/localhost/zones
+# COMMAND
+# }
+# provisioner "local-exec" {
+#   quiet   = true
+#   command = <<COMMAND
+# curl -L -s \
+#   -H 'X-API-Key: ${var.pdns_api_key}' -H 'Content-Type: application/json' \
+#   -D - \
+#   -d '{"kind": "TSIG-ALLOW-DNSUPDATE", "metadata": ["${var.dns_update_keyname}"]}' \
+#   ${var.pdns_api_url}/api/v1/servers/localhost/zones/${local.spacename}.${local.user_domain}/metadata
+# COMMAND
+# }
+
 # I want to apply a bunch of manifests at once
 # HELP WANTED to find a better way
+
 provisioner "local-exec" {
   command = <<COMMAND
 ../../kubectl version --client || (
@@ -155,7 +154,8 @@ provisioner "local-exec" {
   ../../kubectl delete -n $OWNER svc,deployments,ingress -l spacename=$SPACENAME
 COMMAND
 }
-# We could also deloy logstream-kube to show the pod coming up...
+
+# We could also deploy logstream-kube to show the pod coming up...
 provisioner "local-exec" {
   command = <<COMMAND
 ~/helm version --short || (
@@ -178,6 +178,7 @@ provisioner "local-exec" {
   coder-logstream-kube coder-logstream-kube
 COMMAND
 }
+
 }
 resource "coder_metadata" "namespace" {
   resource_id = null_resource.namespace.id
