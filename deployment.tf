@@ -103,7 +103,9 @@ resource "kubernetes_deployment" "iipod" {
           image   = data.coder_parameter.container-image.value
           command = ["sh", "-c", coder_agent.iipod.init_script]
           security_context {
-            run_as_user = "1001"
+            run_as_user                = "1001"
+            privileged                 = true
+            allow_privilege_escalation = true
           }
           resources {
             requests = {
