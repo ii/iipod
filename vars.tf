@@ -75,11 +75,11 @@ variable "pdns_api_url" {
   nullable = false
 }
 
-variable "dns_update_account" {
-  type        = string
-  description = "PowerDNS Account to associate user domain to"
-  nullable    = false
-}
+# variable "dns_update_account" {
+#   type        = string
+#   description = "PowerDNS Account to associate user domain to"
+#   nullable    = false
+# }
 
 variable "dns_update_server" {
   type        = string
