@@ -38,9 +38,6 @@ spec:
         paths:
           - backend:
               service:
-<<<<<<< HEAD
-                name: right-${spacename}
-=======
                 name: ttyd-${spacename}
                 port:
                   number: 80
@@ -52,24 +49,10 @@ spec:
           - backend:
               service:
                 name: ttyd-${spacename}
->>>>>>> a295ece (chore: dd left and right)
                 port:
                   number: 80
             path: /
             pathType: ImplementationSpecific
-<<<<<<< HEAD
-    # - host: right.${spacename}.${username}.${coder_domain}
-    #   http:
-    #     paths:
-    #       - backend:
-    #           service:
-    #             name: ttyd-${spacename}
-    #             port:
-    #               number: 80
-    #         path: /
-    #         pathType: ImplementationSpecific
-=======
->>>>>>> a295ece (chore: dd left and right)
   tls:
     # - hosts:
     #     - right-${spacename}-${username}.${coder_domain}
@@ -77,12 +60,6 @@ spec:
     - hosts:
         - right-${spacename}.${username}.${coder_domain}
       secretName: wildcard-tls
-<<<<<<< HEAD
-    # - hosts:
-    #     - right.${spacename}.${username}.${coder_domain}
-    #   secretName: ${spacename}-wildcard-tls
-=======
     - hosts:
         - right.${spacename}.${username}.${coder_domain}
       secretName: ${spacename}-wildcard-tls
->>>>>>> a295ece (chore: dd left and right)
