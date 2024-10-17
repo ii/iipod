@@ -124,3 +124,7 @@ kitty -T KITTY --detach --hold --start-as=maximized bash -c 'tmux at'
 # # kubectl -n flux-system  wait --timeout=10m --for=condition=Released helmrelease snoopdb
 # kubectl -n default logs statefulset/snoopdb --since=1s -f
 # "
+
+if service --status-all |& grep -q docker; then
+    sudo service docker start
+fi
