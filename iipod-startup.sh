@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -x
 
 # Caclulate vars needod for REPO and ORGFILE
