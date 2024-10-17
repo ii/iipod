@@ -1,4 +1,4 @@
-FROM ubuntu:focal-20231211
+FROM ubuntu:mantic-20231128
 
 # install enough to setup apt repos
 RUN DEBIAN_FRONTEND=noninteractive \
@@ -29,7 +29,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
     && DEBIAN_FRONTEND=noninteractive apt-get update
 
 
-# install main packages
+# apt install packages
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get install --yes \
     tmux \
@@ -41,11 +41,8 @@ RUN DEBIAN_FRONTEND=noninteractive \
     sudo \
     vim \
     wget \
-    dpkg-dev \
-    devscripts \
+    emacs-pgtk \
     language-pack-en \
-    libgccjit-10-dev \
-    libgtk-3-bin \
     openssh-client \
     postgresql-client \
     jq \
@@ -63,7 +60,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
     psmisc \
     iproute2 \
     tcpdump \
-    openjdk-17-jdk \
     rlwrap \
     fonts-powerline \
     flatpak-xdg-utils \
@@ -78,6 +74,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
     iftop \
     ripgrep \
     python-is-python3 \
+    nodejs \
     pipenv \
     gettext-base \
     locate \
@@ -92,19 +89,25 @@ RUN DEBIAN_FRONTEND=noninteractive \
     kitty \
     plasma-desktop \
     dbus-x11 \
-    firefox-esr \
     websockify \
     code \
     cmake \
+    dpkg-dev \
+    devscripts \
     libwebsockets-dev \
     libjson-c-dev \
+    openjdk-17-jdk \
 	&& ln -s /usr/bin/fdfind /usr/local/bin/fd \
 	&& rm -rf /var/lib/apt/lists/*
+    # firefox-esr \
     # ubuntu-desktop \
+    # libgccjit-13-dev \
+    # libgtk-3-bin \
     # && apt-key fingerprint 0EBFCD88 \
 
 # Install novnc from juanjodiaz branch
-RUN git clone --branch add_clipboard_support https://github.com/juanjoDiaz/noVNC.git /usr/share/novnc
+RUN git clone --branch add_clipboard_support \
+  https://github.com/juanjoDiaz/noVNC.git /usr/share/novnc
 
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
   && touch /etc/localtime
@@ -182,7 +185,7 @@ RUN . /usr/local/lib/arch-helper.sh \
 ENV NERDCTL_VERSION=1.7.2
 RUN . /usr/local/lib/arch-helper.sh \
   && curl -L https://github.com/containerd/nerdctl/releases/download/v${NERDCTL_VERSION}/nerdctl-${NERDCTL_VERSION}-linux-${ARCH_TYPE_2}.tar.gz | tar --directory /usr/local/bin --extract --ungzip nerdctl
-# Leiningen for clojure
+# Leiningen for clojure / needs jdk
 ENV CLOJURE_VERSION=1.11.1 LEIN_VERSION=stable
 RUN curl -fsSL https://raw.githubusercontent.com/technomancy/leiningen/${LEIN_VERSION}/bin/lein \
     -o /usr/local/bin/lein \
@@ -244,56 +247,56 @@ RUN curl -s https://fluxcd.io/install.sh | bash
 RUN sudo su -c "flux completion bash > /etc/bash_completion.d/flux"
 RUN sudo su -c "kubectl completion bash > /etc/bash_completion.d/kubectl"
 
-# Ensure we have the deps for building emacs from HEAD
-RUN add-apt-repository ppa:ubuntu-elisp/ppa --yes && \
-  sed -i -e 's/^#\ //' /etc/apt/sources.list.d/ubuntu-elisp-ubuntu-ppa-focal.list && \
-  DEBIAN_FRONTEND="noninteractive" apt-get update && \
-  DEBIAN_FRONTEND="noninteractive" apt-get -y build-dep emacs-snapshot
+# # Ensure we have the deps for building emacs from HEAD
+# RUN add-apt-repository ppa:ubuntu-elisp/ppa --yes && \
+#   sed -i -e 's/^#\ //' /etc/apt/sources.list.d/ubuntu-elisp-ubuntu-ppa-mantic.list && \
+#   DEBIAN_FRONTEND="noninteractive" apt-get update && \
+#   DEBIAN_FRONTEND="noninteractive" apt-get -y build-dep emacs-snapshot
 
-# Get emacs src
-RUN mkdir -p /usr/local/src && \
-  cd /usr/local/src && \
-  git clone --depth 1 https://git.savannah.gnu.org/git/emacs.git
+# # Get emacs src
+# RUN mkdir -p /usr/local/src && \
+#   cd /usr/local/src && \
+#   git clone --depth 1 https://git.savannah.gnu.org/git/emacs.git
 
-# Build emacs from src with pgtk installing to /usr/local
-RUN cd /usr/local/src/emacs && \
-  ./autogen.sh && \
-  ./configure --prefix=/usr/local \
-    --with-modules=yes \
-    --with-json=yes \
-    --with-native-compilation=yes \
-    --with-x=yes \
-    --with-x-toolkit=gtk3 \
-    --with-xwidgets=yes \
-    --with-pgtk=yes && \
-  make -j 64 && \
-  make install
+# # Build emacs from src with pgtk installing to /usr/local
+# RUN cd /usr/local/src/emacs && \
+#   ./autogen.sh && \
+#   ./configure --prefix=/usr/local \
+#     --with-modules=yes \
+#     --with-json=yes \
+#     --with-native-compilation=yes \
+#     --with-x=yes \
+#     --with-x-toolkit=gtk3 \
+#     --with-xwidgets=yes \
+#     --with-pgtk=yes && \
+#   make -j 64 && \
+#   make install
 
-# Build emacs from src without pgtk installing to /usr/local
-RUN cd /usr/local/src/emacs && \
-  ./autogen.sh && \
-  ./configure --prefix=/usr/local/stow/emacs-x \
-    --with-modules=yes \
-    --with-json=yes \
-    --with-native-compilation=yes \
-    --with-x=yes \
-    --with-x-toolkit=gtk3 \
-    --with-xwidgets=yes \
-    --with-pgtk=no && \
-  make -j 64 && \
-  make install
+# # Build emacs from src without pgtk installing to /usr/local
+# RUN cd /usr/local/src/emacs && \
+#   ./autogen.sh && \
+#   ./configure --prefix=/usr/local/stow/emacs-x \
+#     --with-modules=yes \
+#     --with-json=yes \
+#     --with-native-compilation=yes \
+#     --with-x=yes \
+#     --with-x-toolkit=gtk3 \
+#     --with-xwidgets=yes \
+#     --with-pgtk=no && \
+#   make -j 64 && \
+#   make install
 
 # Links
 RUN ln -sf /usr/bin/firefox-esr /usr/bin/firefox
-RUN ln -s /usr/bin/coder /usr/local/bin/coop
-RUN ln -s /usr/bin/coder /usr/local/bin/space
 
+# create ii user
 ARG USER=ii
 ENV LANG=en_US.utf8
 RUN useradd --groups sudo --no-create-home --shell /bin/bash ${USER} \
 	&& echo "${USER} ALL=(ALL) NOPASSWD:ALL" >/etc/sudoers.d/${USER} \
 	&& chmod 0440 /etc/sudoers.d/${USER}
 
+# from here down, everything done as ii user
 USER $USER
 WORKDIR /home/${USER}
 RUN mkdir -p ~/.config

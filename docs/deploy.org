@@ -91,11 +91,11 @@ ssh -A ii@sharing.io
 #+end_src
 ** CODER_CONFIG_DIR
 #+begin_src tmux
-export CODER_CONFIG_DIR=~/.config/space.cloudnative.nz
+export CODER_CONFIG_DIR=~/.config/coder.sharing.io
 #+end_src
 ** coder login
 #+begin_src tmux
-coder login https://space.cloudnative.nz
+coder login https://coder.sharing.io
 #+end_src
 * template
 :PROPERTIES:
@@ -109,6 +109,9 @@ ssh -A ii@sharing.io
 #+begin_src tmux
 cd ~/iipod
 #+end_src
+
+#+RESULTS:
+
 ** init terraform
 coder now supports speeding things up if you `terraform init` so .terraform.lock.hcl is pushed the template and cached.
 https://github.com/coder/coder/pull/7604/files
@@ -122,35 +125,40 @@ WARN: No .terraform.lock.hcl file found
 #+begin_src tmux
 terraform init
 #+end_src
+
+#+RESULTS:
+
 ** push/create the template with terraform vars
 #+begin_src tmux
-# export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
-export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
+export CODER_CONFIG_DIR=~/.config/coder.sharing.io
 export CODER_TEMPLATE_NAME=iipod
 cd ~/iipod
 source .envrc
-coder template push --create \
+coder template push \
     --yes \
     --directory . \
-    --message "$USER iipod Template at $(date)" \
-    --variable dns_update_keysecret=$DNS_UPDATE_KEYSECRET \
-    --variable pdns_account=$PDNS_ACCOUNT \
-    --variable pdns_api_key=$PDNS_API_KEY \
-    --variable pdns_api_url=$PDNS_API_URL \
     --variable coder_url=$CODER_URL \
-    --variable coder_domain=$CODER_DOMAIN \
-    --variable local_ip=$LOCAL_IP \
     --variable public_ip=$PUBLIC_IP \
-    --variable pdns_api_url=$DNS_API_URL \
-    --variable pdns_account=$DNS_ACCOUNT \
+    --variable coder_domain=$CODER_DOMAIN \
+    --variable openai_api_token=$OPENAI_API_TOKEN \
+    --variable pdns_api_url=$PDNS_API_URL \
+    --variable pdns_api_key=$PDNS_API_KEY \
+    --variable dns_update_account=$DNS_UPDATE_ACCOUNT \
     --variable dns_update_server=$DNS_UPDATE_SERVER \
     --variable dns_update_keyname=$DNS_UPDATE_KEYNAME \
     --variable dns_update_keyalgorithm=$DNS_UPDATE_KEYALGORITHM \
+    --variable dns_update_keysecret=$DNS_UPDATE_KEYSECRET \
     --variable default_git_url=$DEFAULT_GIT_URL \
     --variable default_org_url=$DEFAULT_ORG_URL \
     --variable default_container_image=$DEFAULT_CONTAINER_IMAGE \
-    $CODER_TEMPLATE_NAME
+    $CODER_TEMPLATE_NAME \
+    --message "$USER iipod Template at $(date)"
 #+end_src
+
+#+RESULTS:
+
+    # \
+    #--name "foo-bar-baz-`date +%T`"
 * workspace
 ** cd to iipod folder
 #+begin_src tmux
@@ -166,16 +174,14 @@ env | grep "DEFAULT_" | sort
 
 #+RESULTS:
 #+begin_src shell
-CODER_SSH_FORWARD_AGENT=true
-CODER_SSH_FORWARD_GPG=false
-CODER_SSH_NO_WAIT=true
-CODER_SSH_WAIT=no
 CODER_TEMPLATE_NAME=iipod
-CODER_WORKSPACE_STOP_AFTER=96h
-DEFAULT_CONTAINER_IMAGE=ghcr.io/ii/iipod:2023.07.31-01
-DEFAULT_GIT_URL=https://github.com/ii/iipod
-DEFAULT_ORG_URL=https://raw.githubusercontent.com/ii/iipod/vcluster/docs/vcluster.org
+CODER_WORKSPACE_STOP_AFTER=7d
+DEFAULT_CONTAINER_IMAGE=ghcr.io/ii/iipod:2024.10.02-01
+DEFAULT_GIT_URL=https://github.com/ii/iipod/
+DEFAULT_ORG_URL=https://raw.githubusercontent.com/ii/iipod/org/vcluster.org
 #+end_src
+
+
 
 ** coder create with parameters
 #+begin_src tmux
@@ -183,7 +189,7 @@ cd ~/iipod
 # These three vars are picked up by coder create
 # export CODER_CONFIG_DIR=~/.config/space.cloudnative.nz
 source .envrc
-export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
+# export CODER_CONFIG_DIR=~/.config/space.uk.cloudnative.coop
 export CODER_TEMPLATE_NAME=iipod
 export CODER_WORKSPACE_STOP_AFTER=8h
 # SPACENAME is in the form fri0838
@@ -208,3 +214,4 @@ EOF
 #+begin_src tmux
 echo FOO
 #+end_src
+a
