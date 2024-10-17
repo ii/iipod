@@ -98,12 +98,46 @@ resource "kubernetes_deployment" "iipod" {
           run_as_user = "1001"
           fs_group    = "1001"
         }
+        volume {
+          name = "modules"
+          host_path {
+            path = "/lib/modules"
+            type = "Directory"
+          }
+        }
+        volume {
+          name = "cgroup"
+          host_path {
+            path = "/sys/fs/cgroup"
+            type = "Directory"
+          }
+        }
+        volume {
+          name = "var-run"
+          empty_dir {
+          }
+        }
+        volume {
+          name = "var-lib-docker"
+          empty_dir {
+          }
+        }
+        dns_policy = "None"
+        dns_config {
+          nameservers = [
+            "1.0.0.1",
+            "1.1.1.1"
+          ]
+        }
+        runtime_class_name = "kata"
         container {
           name    = "iipod"
           image   = data.coder_parameter.container-image.value
           command = ["sh", "-c", coder_agent.iipod.init_script]
           security_context {
-            run_as_user = "1001"
+            run_as_user                = "1001"
+            privileged                 = true
+            allow_privilege_escalation = true
           }
           resources {
             requests = {
@@ -117,6 +151,23 @@ resource "kubernetes_deployment" "iipod" {
               "memory" = "${var.container_resource_memory}Gi"
             }
           }
+          volume_mount {
+            mount_path = "/lib/modules"
+            name       = "modules"
+            read_only  = true
+          }
+          volume_mount {
+            mount_path = "/sys/fs/cgroup"
+            name       = "cgroup"
+          }
+          volume_mount {
+            mount_path = "/var/run"
+            name       = "var-run"
+          }
+          volume_mount {
+            mount_path = "/var/lib/docker"
+            name       = "var-lib-docker"
+          }
           env {
             name  = "CODER_AGENT_TOKEN"
             value = coder_agent.iipod.token
@@ -124,6 +175,33 @@ resource "kubernetes_deployment" "iipod" {
           env {
             name  = "SPACENAME"
             value = local.spacename
+          }
+        }
+        container {
+          name  = "dind"
+          image = "docker:20.10-dind-rootless"
+          security_context {
+            run_as_user = "1001"
+            privileged  = true
+          }
+          resources {
+            limits = {
+              "cpu"    = var.container_resource_cpu
+              "memory" = "${var.container_resource_memory}Gi"
+            }
+          }
+          volume_mount {
+            mount_path = "/lib/modules"
+            name       = "modules"
+            read_only  = true
+          }
+          volume_mount {
+            mount_path = "/var/run"
+            name       = "var-run"
+          }
+          volume_mount {
+            mount_path = "/var/lib/docker"
+            name       = "var-lib-docker"
           }
         }
       }
