@@ -99,19 +99,19 @@ resource "kubernetes_deployment" "iipod" {
           fs_group    = "1001"
         }
         volume {
-          name = "modules"
+          name = "lib-modules"
           host_path {
             path = "/lib/modules"
             type = "Directory"
           }
         }
-        volume {
-          name = "cgroup"
-          host_path {
-            path = "/sys/fs/cgroup"
-            type = "Directory"
-          }
-        }
+        # volume {
+        #   name = "proc-modules"
+        #   host_path {
+        #     path = "/proc/modules"
+        #     type = "Directory"
+        #   }
+        # }
         volume {
           name = "var-run"
           empty_dir {
@@ -129,6 +129,8 @@ resource "kubernetes_deployment" "iipod" {
             "1.1.1.1"
           ]
         }
+        runtime_class_name = "kata"
+        # share_process_namespace = true
         container {
           name    = "iipod"
           image   = data.coder_parameter.container-image.value
@@ -151,15 +153,6 @@ resource "kubernetes_deployment" "iipod" {
             }
           }
           volume_mount {
-            mount_path = "/lib/modules"
-            name       = "modules"
-            read_only  = true
-          }
-          volume_mount {
-            mount_path = "/sys/fs/cgroup"
-            name       = "cgroup"
-          }
-          volume_mount {
             mount_path = "/var/run"
             name       = "var-run"
           }
@@ -175,6 +168,73 @@ resource "kubernetes_deployment" "iipod" {
             name  = "SPACENAME"
             value = local.spacename
           }
+          env {
+            name  = "DOCKER_HOST"
+            value = "tcp://0.0.0.0:2375"
+          }
+        }
+        container {
+          name  = "dind"
+          image = "docker:27.3.1-dind"
+#           command = [
+#             "/bin/sh",
+#             "-c",
+#             true == true ? "sleep infinity" : <<EOF
+# set -xe -o pipefail
+
+# dev=$(ip route show default | grep -E '^default' | sed 's/.*\sdev\s\(\S*\)\s.*$/\1/')
+# addr=$(ip addr show dev "$dev" | grep inet | grep -v inet6 | sed 's/^\s*inet\s\(\S.*\).*\/.*$/\1/')
+
+# echo 1 > /proc/sys/net/ipv4/ip_forward
+# iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p tcp
+# iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p udp
+
+# exec /usr/local/bin/dockerd --iptables=false --ip6tables=false -D
+# EOF
+#           ]
+
+          security_context {
+            privileged  = true
+            allow_privilege_escalation = true
+            run_as_user = "0"
+            capabilities {
+              add = ["all"]
+            }
+            run_as_non_root = false
+            read_only_root_filesystem = false
+          }
+          env {
+            name  = "DOCKER_HOST"
+            value = "tcp://0.0.0.0:2375"
+          }
+          env {
+            name  = "DOCKER_TLS_CERTDIR"
+            value = ""
+          }
+          resources {
+            limits = {
+              "cpu"    = var.container_resource_cpu
+              "memory" = "${var.container_resource_memory}Gi"
+            }
+          }
+          volume_mount {
+            mount_path = "/var/run"
+            name       = "var-run"
+          }
+          volume_mount {
+            mount_path = "/var/lib/docker"
+            name       = "var-lib-docker"
+          }
+          # volume_mount {
+          #   mount_path = "/lib/modules"
+          #   name       = "lib-modules"
+          #   read_only = true
+          # }
+          # volume_mount {
+          #   mount_path = "/proc/modules"
+          #   name       = "proc-modules"
+          #   read_only = true
+          # }
         }
       }
     }
