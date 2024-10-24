@@ -55,7 +55,7 @@ coder template push \
   --variable default_git_url=$DEFAULT_GIT_URL \
   --variable default_org_url=$DEFAULT_ORG_URL \
   --variable default_container_image=$DEFAULT_CONTAINER_IMAGE \
-  $CODER_TEMPLATE_NAME-privileged \
+  $CODER_TEMPLATE_NAME \
   --message "$USER iipod Template at $(date)" --variable public_ip="$(dig +short A coder.sharing.io)" \
   --variable privileged=false
 #+end_src
@@ -84,3 +84,7 @@ coder template push \
   --message "$USER iipod Template at $(date)" --variable public_ip="$(dig +short A coder.sharing.io)" \
   --variable privileged=true
 #+end_src
+
+* Note
+
+Privileged requires the namespace label ~pod-security.kubernetes.io/enforce: privileged~.
