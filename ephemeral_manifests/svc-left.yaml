@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: left-${spacename}
+  namespace: ${namespace}
+  labels:
+    spacename: ${spacename}
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 7680
+  selector:
+    spacename: ${spacename}
+    spaceapp: iipod

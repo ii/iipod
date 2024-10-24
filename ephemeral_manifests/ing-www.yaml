@@ -23,16 +23,16 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: www-${spacename}-${username}.${coder_domain}
-      http:
-        paths:
-          - backend:
-              service:
-                name: www-${spacename}
-                port:
-                  number: 80
-            path: /
-            pathType: ImplementationSpecific
+    # - host: www-${spacename}-${username}.${coder_domain}
+    #   http:
+    #     paths:
+    #       - backend:
+    #           service:
+    #             name: www-${spacename}
+    #             port:
+    #               number: 80
+    #         path: /
+    #         pathType: ImplementationSpecific
     - host: www.${spacename}.${username}.${coder_domain}
       http:
         paths:
@@ -43,13 +43,23 @@ spec:
                   number: 80
             path: /
             pathType: ImplementationSpecific
+    # - host: www.${spacename}-${username}.${coder_domain}
+    #   http:
+    #     paths:
+    #       - backend:
+    #           service:
+    #             name: www-${spacename}
+    #             port:
+    #               number: 80
+    #         path: /
+    #         pathType: ImplementationSpecific
   tls:
-    - hosts:
-        - www-${spacename}-${username}.${coder_domain}
-      # This one uses the default cert
+    # - hosts:
+    #     - www-${spacename}-${username}.${coder_domain}
+    #   # This one uses the default cert
     - hosts:
         - www-${spacename}.${username}.${coder_domain}
       secretName: wildcard-tls
-    - hosts:
-        - www.${spacename}.${username}.${coder_domain}
-      secretName: ${spacename}-wildcard-tls
+    # - hosts:
+    #     - www.${spacename}.${username}.${coder_domain}
+    #   secretName: ${spacename}-wildcard-tls

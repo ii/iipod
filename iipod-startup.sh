@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -x
 
 # Caclulate vars needod for REPO and ORGFILE
@@ -9,21 +9,12 @@ ORGFILE=$(basename "$ORGFILE_URL")
 echo "Starting TMUX session: $SPACE_NAME:iipod"
 tmux new -d -s $SPACENAME -n "iipod"
 tmux send-keys -t "$SPACENAME:iipod" "
-git clone $GIT_REPO
-cd $REPO_DIR
 wget $ORGFILE_URL
+git clone $GIT_REPO
 # ensure we can git push via ssh
 mkdir -p ~/.ssh
 ssh-keyscan -H github.com >>~/.ssh/known_hosts
 git remote add ssh $GIT_REPO_SSH
-"
-
-echo "Starting TMUX session: $SPACE_NAME:emacs"
-tmux new-window -d -t $SPACENAME -n "emacs"
-tmux send-keys -t "$SPACENAME:emacs" "
-sleep 15
-cd $REPO_DIR
-emacsclient -nw $ORGFILE
 "
 
 echo "Starting TMUX session: servers:ii"
@@ -32,9 +23,22 @@ tmux send-keys -t "servers:ii" "
 echo These windows contain the services supporting your iipod
 "
 
-echo "Starting TMUX session: servers:ttyd"
-tmux new-window -d -t "servers" -n "ttyd"
-tmux send-keys -t "servers:ttyd" "
+echo "Starting TMUX session: servers:emacs"
+tmux new-window -d -t servers -n "emacs"
+tmux send-keys -t "servers:emacs" "
+sleep 15
+emacsclient -nw $ORGFILE
+"
+
+echo "Starting TMUX session: servers:left-ttyd"
+tmux new-window -d -t "servers" -n "left-ttyd"
+tmux send-keys -t "servers:left-ttyd" "
+ttyd --writable -p 7680 tmux at -t servers
+"
+
+echo "Starting TMUX session: servers:right-ttyd"
+tmux new-window -d -t "servers" -n "right-ttyd"
+tmux send-keys -t "servers:right-ttyd" "
 ttyd --writable tmux at -t $SPACENAME
 "
 
@@ -120,3 +124,7 @@ kitty -T KITTY --detach --hold --start-as=maximized bash -c 'tmux at'
 # # kubectl -n flux-system  wait --timeout=10m --for=condition=Released helmrelease snoopdb
 # kubectl -n default logs statefulset/snoopdb --since=1s -f
 # "
+
+if [ "${IIPOD_USE_DOCKER}" = "true" ] && service --status-all |& grep -q docker; then
+    sudo service docker start
+fi
