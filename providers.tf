@@ -16,6 +16,10 @@ terraform {
       source  = "hashicorp/helm"
       version = "2.12.1"
     }
+    kubernetes = {
+      source = "hashicorp/kubernetes"
+      version = "2.33.0"
+    }
     # github = {
     #   source  = "integrations/github"
     #   version = "5.29.0" # Current as of July 10th 2023

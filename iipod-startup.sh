@@ -125,6 +125,6 @@ kitty -T KITTY --detach --hold --start-as=maximized bash -c 'tmux at'
 # kubectl -n default logs statefulset/snoopdb --since=1s -f
 # "
 
-# if service --status-all |& grep -q docker; then
-#     sudo service docker start
-# fi
+if [ "${IIPOD_USE_DOCKER}" = "true" ] && service --status-all |& grep -q docker; then
+    sudo service docker start
+fi

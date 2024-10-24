@@ -1,0 +1,86 @@
+* iipod
+
+Setup
+
+#+begin_src bash
+terraform init
+#+end_src
+
+Create a .envrc
+
+#+begin_src shell
+export CODER_URL="https://coder.sharing.io"
+export CODER_DOMAIN="coder.sharing.io" #*.DOMAIN for spaces
+export LOCAL_IP="" # local to the cluster for ingress
+export PUBLIC_IP="" # external DNS / reachable by everyone
+# Need to create domains, so need PDNS account
+export PDNS_API_KEY="" # Usually pretty short
+export PDNS_API_URL="https://pdns.ii.nz" # We may run this per cluster later
+export PDNS_API_ACCOUNT="" # Actually the PowerDNS Admin account
+# RFC2136 TSIG
+export DNS_UPDATE_SERVER="" # DNS Server to connect to
+export DNS_UPDATE_KEYNAME="sharing.io." # TSIG Key Name
+export DNS_UPDATE_KEYALGORITHM="hmac-sha256" # TSIG Key Algorithm
+export DNS_UPDATE_KEYSECRET=""
+# The rest of these are for the defaults for the template default vars and workspace rich-params
+export DEFAULT_GIT_URL="https://github.com/ii/iipod/"
+export DEFAULT_ORG_URL=""
+export DEFAULT_CONTAINER_IMAGE="ghcr.io/ii/iipod:2024.10.17.2139"
+
+# For when we create/push a template, to push a .terraform.lock
+export TF_VERSION="1.9.7"
+# For when we instanciate a template, the name and how long to keep it up
+export CODER_TEMPLATE_NAME="iipod"
+# export CODER_WORKSPACE_STOP_AFTER="7d"
+export OPENAI_API_TOKEN=""
+#+end_src
+
+Push the standard template
+
+#+begin_src shell
+coder template push \
+  --yes \
+  --directory . \
+  --variable coder_url=$CODER_URL \
+  --variable ingress_ip=$INGRESS_IP \
+  --variable coder_domain=$CODER_DOMAIN \
+  --variable openai_api_token=$OPENAI_API_TOKEN \
+  --variable pdns_api_url=$PDNS_API_URL \
+  --variable pdns_api_key=$PDNS_API_KEY \
+  --variable pdns_api_account=$PDNS_API_ACCOUNT \
+  --variable dns_update_server=$DNS_UPDATE_SERVER \
+  --variable dns_update_keyname=$DNS_UPDATE_KEYNAME \
+  --variable dns_update_keyalgorithm=$DNS_UPDATE_KEYALGORITHM \
+  --variable dns_update_keysecret=$DNS_UPDATE_KEYSECRET \
+  --variable default_git_url=$DEFAULT_GIT_URL \
+  --variable default_org_url=$DEFAULT_ORG_URL \
+  --variable default_container_image=$DEFAULT_CONTAINER_IMAGE \
+  $CODER_TEMPLATE_NAME-privileged \
+  --message "$USER iipod Template at $(date)" --variable public_ip="$(dig +short A coder.sharing.io)" \
+  --variable privileged=false
+#+end_src
+
+Push the privileged template
+
+#+begin_src shell
+coder template push \
+  --yes \
+  --directory . \
+  --variable coder_url=$CODER_URL \
+  --variable ingress_ip=$INGRESS_IP \
+  --variable coder_domain=$CODER_DOMAIN \
+  --variable openai_api_token=$OPENAI_API_TOKEN \
+  --variable pdns_api_url=$PDNS_API_URL \
+  --variable pdns_api_key=$PDNS_API_KEY \
+  --variable pdns_api_account=$PDNS_API_ACCOUNT \
+  --variable dns_update_server=$DNS_UPDATE_SERVER \
+  --variable dns_update_keyname=$DNS_UPDATE_KEYNAME \
+  --variable dns_update_keyalgorithm=$DNS_UPDATE_KEYALGORITHM \
+  --variable dns_update_keysecret=$DNS_UPDATE_KEYSECRET \
+  --variable default_git_url=$DEFAULT_GIT_URL \
+  --variable default_org_url=$DEFAULT_ORG_URL \
+  --variable default_container_image=$DEFAULT_CONTAINER_IMAGE \
+  $CODER_TEMPLATE_NAME-privileged \
+  --message "$USER iipod Template at $(date)" --variable public_ip="$(dig +short A coder.sharing.io)" \
+  --variable privileged=true
+#+end_src

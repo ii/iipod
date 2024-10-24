@@ -181,3 +181,8 @@ variable "public_ip" {
     error_message = "Must be valid IP Address"
   }
 }
+
+variable "privileged" {
+  type        = bool
+  description = "Whether to deploy a privileged environment"
+}
