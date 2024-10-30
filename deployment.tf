@@ -45,6 +45,12 @@ resource "coder_metadata" "iipod" {
   }
 }
 
+locals {
+  pod_annotations_privileged = {
+    "k8s.v1.cni.cncf.io/networks" = "kube-system/br0"
+  }
+}
+
 resource "kubernetes_deployment" "iipod" {
   wait_for_rollout = false # For use with https://github.com/coder/coder-logstream-kube
   count            = data.coder_workspace.ii.transition == "start" ? 1 : 0
@@ -89,6 +95,7 @@ resource "kubernetes_deployment" "iipod" {
           "spaceapp" : "iipod"
           "app.kubernetes.io/name" = "coder-workspace"
         }
+        annotations = var.privileged == true ? local.pod_annotations_privileged : null
       }
       spec {
         # looks nicer than iipod-tues511-38a8euw3-3t3e8e83s
