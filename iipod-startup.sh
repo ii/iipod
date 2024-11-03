@@ -126,5 +126,9 @@ kitty -T KITTY --detach --hold --start-as=maximized bash -c 'tmux at'
 # "
 
 if [ "${IIPOD_USE_DOCKER}" = "true" ] && service --status-all |& grep -q docker; then
+    # NOTE use Cilium not Multus
+    if ip route | grep -q net1; then
+        sudo ip route del default dev net1
+    fi
     sudo service docker start
 fi
