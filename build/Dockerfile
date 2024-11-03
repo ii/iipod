@@ -1,4 +1,4 @@
-FROM ubuntu:mantic-20231128
+FROM ubuntu:noble-20241009
 
 # install enough to setup apt repos
 RUN DEBIAN_FRONTEND=noninteractive \
@@ -32,71 +32,74 @@ RUN DEBIAN_FRONTEND=noninteractive \
 # apt install packages
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get install --yes \
-    tmux \
-    tmate \
-    bash-completion \
-    less \
-    git \
-    xz-utils \
-    sudo \
-    vim \
-    wget \
-    emacs-pgtk \
-    language-pack-en \
-    openssh-client \
-    postgresql-client \
-    jq \
     apache2-utils \
-    inotify-tools \
-    xtermcontrol \
-    tzdata \
-    silversearcher-ag \
-    direnv \
-    rsync \
-    lsof \
-    htop \
-    file \
-    unzip \
-    psmisc \
-    iproute2 \
-    tcpdump \
-    rlwrap \
-    fonts-powerline \
-    flatpak-xdg-utils \
-    google-cloud-sdk \
-    bsdmainutils \
-    awscli \
-    python3-pip \
-    dnsutils \
-    net-tools \
-    tree \
-    iputils-ping \
-    iftop \
-    ripgrep \
-    python-is-python3 \
-    nodejs \
-    pipenv \
-    gettext-base \
-    locate \
-    fd-find \
-    graphviz \
-    netcat-openbsd \
     asciinema \
-    ssh-import-id \
-    docker-ce-cli \
-    tigervnc-standalone-server \
-    icewm \
-    kitty \
-    plasma-desktop \
-    dbus-x11 \
-    websockify \
-    code \
+    bash-completion \
+    bsdmainutils \
     cmake \
-    dpkg-dev \
+    code \
+    dbus-x11 \
     devscripts \
-    libwebsockets-dev \
+    direnv \
+    dnsutils \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io \
+    docker-buildx-plugin \
+    docker-compose-plugin \
+    dpkg-dev \
+    emacs-pgtk \
+    fd-find \
+    file \
+    flatpak-xdg-utils \
+    fonts-powerline \
+    gettext-base \
+    git \
+    google-cloud-sdk \
+    graphviz \
+    htop \
+    icewm \
+    iftop \
+    inotify-tools \
+    iproute2 \
+    iputils-ping \
+    jq \
+    kitty \
+    language-pack-en \
+    less \
     libjson-c-dev \
+    libwebsockets-dev \
+    locate \
+    lsof \
+    net-tools \
+    netcat-openbsd \
+    nodejs \
     openjdk-17-jdk \
+    openssh-client \
+    pipenv \
+    plasma-desktop \
+    postgresql-client \
+    psmisc \
+    python-is-python3 \
+    python3-pip \
+    ripgrep \
+    rlwrap \
+    rsync \
+    silversearcher-ag \
+    ssh-import-id \
+    sudo \
+    tcpdump \
+    tigervnc-standalone-server \
+    tmate \
+    tmux \
+    tree \
+    tzdata \
+    unzip \
+    vim \
+    websockify \
+    wget \
+    xtermcontrol \
+    xz-utils \
 	&& ln -s /usr/bin/fdfind /usr/local/bin/fd \
 	&& rm -rf /var/lib/apt/lists/*
     # firefox-esr \
@@ -114,7 +117,7 @@ RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 # Settings for GO and crictl
 ENV GOROOT=/usr/local/go \
-  GO_VERSION=1.21.6 \
+  GO_VERSION=1.23.2 \
   PATH="$PATH:/usr/local/go/bin:/usr/libexec/flatpak-xdg-utils:/home/ii/go/bin" \
   CONTAINERD_NAMESPACE=k8s.io
 
@@ -126,15 +129,15 @@ RUN . /usr/local/lib/arch-helper.sh \
   && curl -L https://dl.google.com/go/go${GO_VERSION}.linux-${ARCH_TYPE_2}.tar.gz \
     | tar --directory /usr/local --extract --ungzip
 # kind binary
-ENV KIND_VERSION=0.20.0
+ENV KIND_VERSION=0.24.0
 RUN . /usr/local/lib/arch-helper.sh \
   && curl -Lo /usr/local/bin/kind \
     https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-${ARCH_TYPE_2} \
     && chmod +x /usr/local/bin/kind
 # kubectl binary
-ENV KUBECTL_VERSION=1.29.1
+ENV KUBECTL_VERSION=1.31.1
 RUN . /usr/local/lib/arch-helper.sh \
-  && curl -L https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/${ARCH_TYPE_2}/kubectl -o /usr/local/bin/kubectl \
+  && curl -L https://dl.k8s.io/v${KUBECTL_VERSION}/bin/linux/${ARCH_TYPE_2}/kubectl -o /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 # tilt binary
 ENV TILT_VERSION=0.33.10
@@ -143,7 +146,7 @@ RUN . /usr/local/lib/arch-helper.sh \
     https://github.com/tilt-dev/tilt/releases/download/v${TILT_VERSION}/tilt.${TILT_VERSION}.linux.${ARCH_TYPE_1}.tar.gz \
     | tar --directory /usr/local/bin --extract --ungzip tilt
 # gh cli
-ENV GH_VERSION=2.42.1
+ENV GH_VERSION=2.58.0
 RUN . /usr/local/lib/arch-helper.sh \
   && curl -sSL https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${ARCH_TYPE_2}.tar.gz \
     | tar --directory /usr/local --extract --ungzip \
@@ -157,11 +160,11 @@ RUN . /usr/local/lib/arch-helper.sh \
     | tar --directory /usr/local/bin --extract --xz \
   --strip-components 1 tmate-${TMATE_VERSION}-static-linux-${ARCH_TYPE_3}/tmate
 # helm binary
-ENV HELM_VERSION=3.14.0
+ENV HELM_VERSION=3.16.2
 RUN . /usr/local/lib/arch-helper.sh \
   && curl -L https://get.helm.sh/helm-v${HELM_VERSION}-linux-${ARCH_TYPE_2}.tar.gz | tar --directory /usr/local/bin --extract -xz --strip-components 1 linux-${ARCH_TYPE_2}/helm
 # talosctl
-ENV TALOSCTL_VERSION=1.6.1
+ENV TALOSCTL_VERSION=1.8.1
 RUN . /usr/local/lib/arch-helper.sh \
   && curl -L -o /usr/local/bin/talosctl https://github.com/talos-systems/talos/releases/download/v${TALOSCTL_VERSION}/talosctl-linux-${ARCH_TYPE_2} && \
   chmod +x /usr/local/bin/talosctl
@@ -191,19 +194,19 @@ RUN curl -fsSL https://raw.githubusercontent.com/technomancy/leiningen/${LEIN_VE
     -o /usr/local/bin/lein \
     && chmod +x /usr/local/bin/lein \
     && lein version
-ENV KN_CLIENT_VERSION=1.11.2
+ENV KN_CLIENT_VERSION=1.15.0
 RUN . /usr/local/lib/arch-helper.sh \
   && curl -L https://github.com/knative/client/releases/download/knative-v${KN_CLIENT_VERSION}/kn-linux-${ARCH_TYPE_2} -o /usr/local/bin/kn \
   && chmod +x /usr/local/bin/kn
-ENV DIVE_VERSION=0.11.0
+ENV DIVE_VERSION=0.12.0
 RUN . /usr/local/lib/arch-helper.sh \
   && curl -L https://github.com/wagoodman/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_${ARCH_TYPE_2}.tar.gz | tar --directory /usr/local/bin --extract --ungzip dive
 ENV UPTERM_VERSION=0.13.0
 RUN . /usr/local/lib/arch-helper.sh \
   && curl -L https://github.com/owenthereal/upterm/releases/download/v${UPTERM_VERSION}/upterm_linux_${ARCH_TYPE_2}.tar.gz | tar --directory /usr/local/bin --extract --ungzip upterm
 ENV METALCLI_VERSION=0.19.0 \
-  KO_VERSION=0.15.1 \
-  GOPLS_VERSION=0.12.2
+  KO_VERSION=0.16.0 \
+  GOPLS_VERSION=0.16.2
 #  GOPLS_VERSION=0.10.0 # Also a big jump... 0.13.0 is just around the corner
 RUN set -x \
   && /bin/env GO111MODULE=on GOPATH=/usr/local/go /usr/local/go/bin/go install golang.org/x/tools/gopls@v$GOPLS_VERSION \
@@ -292,7 +295,7 @@ RUN ln -sf /usr/bin/firefox-esr /usr/bin/firefox
 # create ii user
 ARG USER=ii
 ENV LANG=en_US.utf8
-RUN useradd --groups sudo --no-create-home --shell /bin/bash ${USER} \
+RUN useradd --groups sudo,docker --no-create-home --shell /bin/bash ${USER} \
 	&& echo "${USER} ALL=(ALL) NOPASSWD:ALL" >/etc/sudoers.d/${USER} \
 	&& chmod 0440 /etc/sudoers.d/${USER}
 
