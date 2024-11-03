@@ -157,8 +157,7 @@ resource "kubernetes_deployment" "iipod" {
         dns_config {
           nameservers = [
             "1.0.0.1",
-            "1.1.1.1",
-            "10.200.0.10"
+            "1.1.1.1"
           ]
         }
         runtime_class_name = var.privileged != true ? "kata" : ""
