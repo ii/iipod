@@ -98,6 +98,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
     vim \
     websockify \
     wget \
+    xclip \
     xtermcontrol \
     xz-utils \
 	&& ln -s /usr/bin/fdfind /usr/local/bin/fd \
