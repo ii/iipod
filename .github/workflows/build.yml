@@ -75,16 +75,6 @@ jobs:
           COSIGN_YES: "true"
         run: |
           cosign sign ${{ steps.run-info.outputs.image }}@${{ steps.get-digests.outputs.destination }} -y --recursive
-      - uses: anchore/sbom-action@61119d458adab75f756bc0b9e4bde25725f86a7a # v0.17.2
-        with:
-          image: ${{ steps.run-info.outputs.image }}@${{ steps.get-digests.outputs.destination }}
-          artifact-name: sbom-spdx.json
-          output-file: /tmp/sbom-spdx.json
-      - name: publish sbom blob as blob
-        env:
-          COSIGN_YES: "true"
-        run: |
-          cosign attest --predicate /tmp/sbom-spdx.json ${{ steps.run-info.outputs.image }}@${{ steps.get-digests.outputs.destination }} --recursive
       - name: image
         id: image
         run: |
