@@ -1,11 +1,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: emacs-${spacename}
+  name: left-${spacename}
   namespace: ${namespace}
   labels:
-    spaceapp: emacs
-    spacename: "${spacename}"
+    spaceapp: left
+    spacename: ${spacename}
   annotations:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
@@ -23,43 +23,43 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    # - host: emacs-${spacename}-${username}.${coder_domain}
+    # - host: left-${spacename}-${username}.${coder_domain}
     #   http:
     #     paths:
     #       - backend:
     #           service:
-    #             name: emacs-${spacename}
+    #             name: ttyd-${spacename}
     #             port:
     #               number: 80
     #         path: /
     #         pathType: ImplementationSpecific
-    - host: emacs-${spacename}.${username}.${coder_domain}
+    - host: left-${spacename}.${username}.${coder_domain}
       http:
         paths:
           - backend:
               service:
-                name: emacs-${spacename}
+                name: left-${spacename}
                 port:
                   number: 80
             path: /
             pathType: ImplementationSpecific
-    # - host: emacs.${spacename}.${username}.${coder_domain}
+    # - host: left.${spacename}.${username}.${coder_domain}
     #   http:
     #     paths:
     #       - backend:
     #           service:
-    #             name: emacs-${spacename}
+    #             name: ttyd-${spacename}
     #             port:
     #               number: 80
     #         path: /
     #         pathType: ImplementationSpecific
   tls:
     # - hosts:
-    #     - emacs-${spacename}-${username}.${coder_domain}
+    #     - left-${spacename}-${username}.${coder_domain}
     #   # This one uses the default cert
     - hosts:
-        - emacs-${spacename}.${username}.${coder_domain}
+        - left-${spacename}.${username}.${coder_domain}
       secretName: wildcard-tls
     # - hosts:
-    #     - emacs.${spacename}.${username}.${coder_domain}
+    #     - left.${spacename}.${username}.${coder_domain}
     #   secretName: ${spacename}-wildcard-tls

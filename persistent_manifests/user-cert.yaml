@@ -10,6 +10,6 @@ spec:
     - "${username}.${coder_domain}"
     - "*.${username}.${coder_domain}"
   issuerRef:
-    name: letsencrypt-pdns
+    name: letsencrypt-rfc2136
     kind: ClusterIssuer
     group: cert-manager.io

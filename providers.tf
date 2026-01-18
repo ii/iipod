@@ -2,7 +2,7 @@ terraform {
   required_providers {
     coder = {
       source  = "coder/coder"
-      version = "0.13.0" # Current as of January 17th 2024
+      version = ">= 0.17.0" # Updated for Claude Code module
     }
     equinix = {
       source  = "equinix/equinix"
@@ -15,6 +15,10 @@ terraform {
     helm = {
       source  = "hashicorp/helm"
       version = "2.12.1"
+    }
+    kubernetes = {
+      source = "hashicorp/kubernetes"
+      version = "2.33.0"
     }
     # github = {
     #   source  = "integrations/github"

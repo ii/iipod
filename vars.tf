@@ -4,9 +4,19 @@ data "coder_provisioner" "ii" {
 data "coder_workspace" "ii" {
 }
 
+# New in coder provider v2.0 - owner info moved to separate data source
+data "coder_workspace_owner" "ii" {
+}
+
+# Warning: Deprecated Resource
+# on vars.tf line 7, in data "coder_git_auth" "github":
 # data "coder_git_auth" "github" {
 #   # Matches the ID of the git auth provider in Coder.
-#   id = "primary-github"
+#   id = "github"
+# }
+
+# data "coder_external_auth" "github" {
+#   id = "github"
 # }
 
 # Can be set via TF_VAR_variable_name in the coder process ENV
@@ -14,8 +24,8 @@ data "coder_workspace" "ii" {
 # And deployed with coder template push --variables-file ./vars/space.sharing.io.yaml or similar
 
 locals {
-  username          = lower(data.coder_workspace.ii.owner)
-  namespace         = lower(data.coder_workspace.ii.owner)
+  username          = lower(data.coder_workspace_owner.ii.name)
+  namespace         = lower(data.coder_workspace_owner.ii.name)
   spacename         = lower(data.coder_workspace.ii.name)
   user_domain       = "${local.namespace}.${var.coder_domain}"
   space_domain      = "${local.spacename}.${local.user_domain}"
@@ -48,53 +58,72 @@ variable "coder_domain" {
   }
 }
 
+variable "openai_api_token" {
+  type        = string
+  description = "OpenAI API Token"
+  default     = ""
+  nullable    = true
+}
+
 variable "pdns_api_key" {
   type        = string
   description = "PowerDNS API Key for Powerdns Domain Creation"
-  # default     = "example.com"
-  nullable = false
+  default     = ""
+  nullable    = true
 }
 
 variable "pdns_api_url" {
   type        = string
   description = "PowerDNS API URL for Powerdns Domain Creation"
-  # default     = "https://pdns.ii.nz/"
-  nullable = false
+  default     = ""
+  nullable    = true
 }
 
-variable "pdns_account" {
-  type        = string
-  description = "PowerDNS Account to associate user domain to"
-  nullable    = false
-}
+# variable "dns_update_account" {
+#   type        = string
+#   description = "PowerDNS Account to associate user domain to"
+#   nullable    = false
+# }
 
 variable "dns_update_server" {
   type        = string
   description = "Nameserver for RFC2136 Updates"
-  # default     = "123.253.176.253"
-  nullable = false
-  validation {
-    condition     = can(regex("(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]", var.dns_update_server))
-    error_message = "Invalid input, must be a valid domain name."
-  }
+  default     = ""
+  nullable    = true
 }
 
 variable "dns_update_keyname" {
   type        = string
   description = "TSIG Key Name for RFC2136 Updates"
-  nullable    = false
+  default     = ""
+  nullable    = true
 }
 
 variable "dns_update_keyalgorithm" {
   type        = string
   description = "TSIG Algorithm for RFC2136 Updates"
-  nullable    = false
-  # default     = "hmac-sha256"
+  default     = "hmac-sha256"
+  nullable    = true
 }
 
 variable "dns_update_keysecret" {
   type        = string
   description = "TSIG Key Secret for RFC2136 Updates"
+  default     = ""
+  nullable    = true
+  sensitive   = true
+}
+variable "container_resource_cpu" {
+  type        = number
+  description = "the strict amount of CPU to provide"
+  default     = "4"
+  nullable    = false
+  # sensitive   = true
+}
+variable "container_resource_memory" {
+  type        = number
+  description = "the strict amount of memory to provide in gigabytes"
+  default     = "8"
   nullable    = false
   # sensitive   = true
 }
@@ -135,16 +164,16 @@ variable "default_org_url" {
   }
 }
 
-variable "local_ip" {
-  type        = string
-  description = "Local LB IP"
-  nullable    = false
-  validation {
-    condition     = can(cidrhost("${var.local_ip}/32", 0))
-    error_message = "Must be valid IP Address"
-  }
+# variable "ingress_ip" {
+#   type        = string
+#   description = "Local LB IP"
+#   nullable    = false
+#   validation {
+#     condition     = can(cidrhost("${var.ingress_ip}/32", 0))
+#     error_message = "Must be valid IP Address"
+#   }
 
-}
+# }
 variable "public_ip" {
   type        = string
   description = "Public IP"
@@ -153,4 +182,9 @@ variable "public_ip" {
     condition     = can(cidrhost("${var.public_ip}/32", 0))
     error_message = "Must be valid IP Address"
   }
+}
+
+variable "privileged" {
+  type        = bool
+  description = "Whether to deploy a privileged environment"
 }

@@ -23,6 +23,7 @@ data "coder_parameter" "container-image" {
   description  = "The container image to use for the workspace"
   default      = var.default_container_image
   icon         = "https://raw.githubusercontent.com/matifali/logos/main/docker.svg"
+  mutable      = true
 }
 
 data "coder_parameter" "git-url" {
@@ -30,6 +31,7 @@ data "coder_parameter" "git-url" {
   display_name = "Git URL"
   description  = "The Git URL to checkout for this workspace"
   default      = var.default_git_url
+  mutable      = true
   # icon         = "https://raw.githubusercontent.com/matifali/logos/main/docker.svg"
 }
 
@@ -38,5 +40,56 @@ data "coder_parameter" "org-url" {
   display_name = "Orgfile url"
   description  = "The Orgfile URL to load into emacs"
   default      = var.default_org_url
+  mutable      = true
   # icon         = "https://raw.githubusercontent.com/matifali/logos/main/docker.svg"
 }
+
+# data "coder_parameter" "cpu" {
+#   name         = "cpu"
+#   display_name = "CPU"
+#   description  = "The number of CPU cores"
+#   default      = "4"
+#   icon         = "/icon/memory.svg"
+#   mutable      = true
+#   option {
+#     name  = "4 Cores"
+#     value = "4"
+#   }
+#   option {
+#     name  = "8 Cores"
+#     value = "8"
+#   }
+#   option {
+#     name  = "16 Cores"
+#     value = "16"
+#   }
+#   option {
+#     name  = "32 Cores"
+#     value = "32"
+#   }
+# }
+
+# data "coder_parameter" "memory" {
+#   name         = "memory"
+#   display_name = "Memory"
+#   description  = "The amount of memory in GB"
+#   default      = "8"
+#   icon         = "/icon/memory.svg"
+#   mutable      = true
+#   option {
+#     name  = "8 GB"
+#     value = "8"
+#   }
+#   option {
+#     name  = "16 GB"
+#     value = "16"
+#   }
+#   option {
+#     name  = "32 GB"
+#     value = "32"
+#   }
+#   option {
+#     name  = "64 GB"
+#     value = "64"
+#   }
+# }

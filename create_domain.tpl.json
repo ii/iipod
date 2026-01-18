@@ -2,20 +2,26 @@
   "name": "${DOMAIN}",
   "kind": "Native",
   "nameservers": ["${NS1}.", "${NS2}."],
-  "account": "${ACCOUNTNAME}",
+  "account": "coder",
   "master_tsig_key_ids": ["${KEYNAME}"],
   "rrsets": [
     {
       "name": "*.${DOMAIN}",
       "type": "A",
       "ttl": 60,
-      "records": [{ "content": "${IP}" }]
+      "records": [{ "content": "${INGRESS_IP}" }]
+    }
+    {
+      "name": "@",
+      "type": "A",
+      "ttl": 60,
+      "records": [{ "content": "${INGRESS_IP}" }]
     }
   ],
   "comments": [
     {
       "content": "Created ${DOMAIN} Wildcard",
-      "account": "${ACCOUNTNAME}"
+      "account": "coder"
     }
   ]
 }
