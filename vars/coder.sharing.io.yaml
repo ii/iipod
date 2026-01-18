@@ -15,3 +15,5 @@ dns_update_keysecret: ""
 container_resource_cpu: 4
 container_resource_memory: 8
 privileged: false
+# OpenAI API token (optional, can be empty)
+openai_api_token: ""

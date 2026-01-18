@@ -20,27 +20,27 @@ resource "coder_metadata" "iipod" {
   # https://github.com/coder/coder/pull/10521/files#diff-cbc535e52cef85ed2f3d7ec9ba042a35c692c7bb50a6077d9df1dd0e6d14a752R147
   item {
     key   = "emacs"
-    value = "[emacs-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain}](https://emacs-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain})"
+    value = "[emacs-${local.spacename}.${data.coder_workspace_owner.ii.name}.${var.coder_domain}](https://emacs-${local.spacename}.${data.coder_workspace_owner.ii.name}.${var.coder_domain})"
     # value = "[emacs-${local.space_domain}](https://emacs-${local.space_domain}/)"
   }
   item {
     key   = "left tmux/eye"
-    value = "[left-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain}](https://left-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain})"
+    value = "[left-${local.spacename}.${data.coder_workspace_owner.ii.name}.${var.coder_domain}](https://left-${local.spacename}.${data.coder_workspace_owner.ii.name}.${var.coder_domain})"
     # value = "[lefteye-${local.space_domain}](https://lefteye-${local.space_domain}/)"
   }
   item {
     key   = "right tmux/eye"
-    value = "[right-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain}](https://right-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain})"
+    value = "[right-${local.spacename}.${data.coder_workspace_owner.ii.name}.${var.coder_domain}](https://right-${local.spacename}.${data.coder_workspace_owner.ii.name}.${var.coder_domain})"
     # value = "[righteye-${local.space_domain}](https://righteye-${local.space_domain}/)"
   }
   item {
     key   = "vnc"
-    value = "[vnc-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain}](https://vnc-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain}/?autoconnect=true&resize=remote)"
+    value = "[vnc-${local.spacename}.${data.coder_workspace_owner.ii.name}.${var.coder_domain}](https://vnc-${local.spacename}.${data.coder_workspace_owner.ii.name}.${var.coder_domain}/?autoconnect=true&resize=remote)"
     # value = "[vnc-${emacslocal.space_domain}](https://vnc-${local.space_domain}/?autoconnect=true&resize=remote)"
   }
   item {
     key   = "www"
-    value = "[www-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain}](https://www-${local.spacename}.${data.coder_workspace.ii.owner}.${var.coder_domain})"
+    value = "[www-${local.spacename}.${data.coder_workspace_owner.ii.name}.${var.coder_domain}](https://www-${local.spacename}.${data.coder_workspace_owner.ii.name}.${var.coder_domain})"
     # value = "[www-${local.space_domain}](https://www-${local.space_domain}/)"
   }
 }
@@ -58,23 +58,23 @@ resource "kubernetes_deployment" "iipod" {
     name = "iipod-${local.spacename}"
     # namespace = "spaces" #var.namespace
     # namespace = "coder" #var.namespace
-    # namespace = "${data.coder_workspace.ii.name}-${data.coder_workspace.ii.owner}"
+    # namespace = "${data.coder_workspace.ii.name}-${data.coder_workspace_owner.ii.name}"
     namespace = local.namespace
     # namespace = "coder" #var.namespace
     labels = {
       "spacename" : local.spacename
       "spaceapp" : "iipod"
       "app.kubernetes.io/name"     = "coder-workspace"
-      "app.kubernetes.io/instance" = "coder-workspace-${lower(data.coder_workspace.ii.owner)}-${lower(data.coder_workspace.ii.name)}"
+      "app.kubernetes.io/instance" = "coder-workspace-${lower(data.coder_workspace_owner.ii.name)}-${lower(data.coder_workspace.ii.name)}"
       "app.kubernetes.io/part-of"  = "coder"
       "com.coder.resource"         = "true"
       "com.coder.workspace.id"     = data.coder_workspace.ii.id
       "com.coder.workspace.name"   = data.coder_workspace.ii.name
-      "com.coder.user.id"          = data.coder_workspace.ii.owner_id
-      "com.coder.user.username"    = data.coder_workspace.ii.owner
+      "com.coder.user.id"          = data.coder_workspace_owner.ii.id
+      "com.coder.user.username"    = data.coder_workspace_owner.ii.name
     }
     annotations = {
-      "com.coder.user.email" = data.coder_workspace.ii.owner_email
+      "com.coder.user.email" = data.coder_workspace_owner.ii.email
     }
   }
   spec {

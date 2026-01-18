@@ -4,6 +4,10 @@ data "coder_provisioner" "ii" {
 data "coder_workspace" "ii" {
 }
 
+# New in coder provider v2.0 - owner info moved to separate data source
+data "coder_workspace_owner" "ii" {
+}
+
 # Warning: Deprecated Resource
 # on vars.tf line 7, in data "coder_git_auth" "github":
 # data "coder_git_auth" "github" {
@@ -20,8 +24,8 @@ data "coder_workspace" "ii" {
 # And deployed with coder template push --variables-file ./vars/space.sharing.io.yaml or similar
 
 locals {
-  username          = lower(data.coder_workspace.ii.owner)
-  namespace         = lower(data.coder_workspace.ii.owner)
+  username          = lower(data.coder_workspace_owner.ii.name)
+  namespace         = lower(data.coder_workspace_owner.ii.name)
   spacename         = lower(data.coder_workspace.ii.name)
   user_domain       = "${local.namespace}.${var.coder_domain}"
   space_domain      = "${local.spacename}.${local.user_domain}"
@@ -57,8 +61,8 @@ variable "coder_domain" {
 variable "openai_api_token" {
   type        = string
   description = "OpenAI API Token"
-  # default     = "example.com"
-  nullable = true
+  default     = ""
+  nullable    = true
 }
 
 variable "pdns_api_key" {

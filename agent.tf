@@ -7,9 +7,7 @@ resource "coder_agent" "iipod" {
   troubleshooting_url     = "http://ii.nz" # blocking, non-blocking
   connection_timeout      = 300
   startup_script          = file("./iipod-startup.sh")
-  startup_script_timeout  = 300
   shutdown_script         = file("./iipod-shutdown.sh")
-  shutdown_script_timeout = 300
   env = {
     # GITHUB_TOKEN = "$${data.coder_git_auth.github.access_token}"
     # GITHUB_TOKEN = "${data.coder_external_auth.github.access_token}"
@@ -21,10 +19,10 @@ resource "coder_agent" "iipod" {
     SESSION_NAME        = "${lower(data.coder_workspace.ii.name)}"
     GIT_REPO            = "${data.coder_parameter.git-url.value}"
     SPACE_DOMAIN        = "${local.space_domain}"
-    GIT_AUTHOR_NAME     = "${data.coder_workspace.ii.owner}"
-    GIT_COMMITTER_NAME  = "${data.coder_workspace.ii.owner}"
-    GIT_AUTHOR_EMAIL    = "${data.coder_workspace.ii.owner_email}"
-    GIT_COMMITTER_EMAIL = "${data.coder_workspace.ii.owner_email}"
+    GIT_AUTHOR_NAME     = "${data.coder_workspace_owner.ii.name}"
+    GIT_COMMITTER_NAME  = "${data.coder_workspace_owner.ii.name}"
+    GIT_AUTHOR_EMAIL    = "${data.coder_workspace_owner.ii.email}"
+    GIT_COMMITTER_EMAIL = "${data.coder_workspace_owner.ii.email}"
   }
   display_apps {
     port_forwarding_helper = true

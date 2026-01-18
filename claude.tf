@@ -24,10 +24,8 @@ data "coder_parameter" "claude_oauth_token" {
 
 # Resolve token: user-provided takes precedence, then template default
 locals {
-  claude_token = coalesce(
-    data.coder_parameter.claude_oauth_token.value,
-    var.claude_oauth_token
-  )
+  # Use user token if provided, otherwise fall back to template variable
+  claude_token = data.coder_parameter.claude_oauth_token.value != "" ? data.coder_parameter.claude_oauth_token.value : var.claude_oauth_token
 }
 
 # Claude Code module from Coder registry
