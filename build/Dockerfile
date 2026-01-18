@@ -308,7 +308,7 @@ RUN mkdir -p ~/.config
 # Doom Emacs
 RUN git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
 RUN git clone --depth 1 https://github.com/ii/doom-config ~/.config/doom
-RUN yes | ~/.config/emacs/bin/doom install --env --fonts
+RUN yes | ~/.config/emacs/bin/doom install --env
 RUN cd ~/.config/doom && git pull && ~/.config/emacs/bin/doom sync || true && true || true
 
 # Our tmux uses yank now

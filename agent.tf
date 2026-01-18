@@ -14,7 +14,9 @@ resource "coder_agent" "iipod" {
     # GITHUB_TOKEN = "$${data.coder_git_auth.github.access_token}"
     # GITHUB_TOKEN = "${data.coder_external_auth.github.access_token}"
     # Just a hidden feature for now to try out
-    OPENAI_API_TOKEN    = "${var.openai_api_token}"
+    OPENAI_API_TOKEN       = "${var.openai_api_token}"
+    # Claude Code OAuth token (long-lived)
+    CLAUDE_CODE_OAUTH_TOKEN = local.claude_token
     ORGFILE_URL         = "${data.coder_parameter.org-url.value}"
     SESSION_NAME        = "${lower(data.coder_workspace.ii.name)}"
     GIT_REPO            = "${data.coder_parameter.git-url.value}"

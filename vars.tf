@@ -64,15 +64,15 @@ variable "openai_api_token" {
 variable "pdns_api_key" {
   type        = string
   description = "PowerDNS API Key for Powerdns Domain Creation"
-  # default     = "example.com"
-  nullable = false
+  default     = ""
+  nullable    = true
 }
 
 variable "pdns_api_url" {
   type        = string
   description = "PowerDNS API URL for Powerdns Domain Creation"
-  # default     = "https://pdns.ii.nz/"
-  nullable = false
+  default     = ""
+  nullable    = true
 }
 
 # variable "dns_update_account" {
@@ -84,32 +84,30 @@ variable "pdns_api_url" {
 variable "dns_update_server" {
   type        = string
   description = "Nameserver for RFC2136 Updates"
-  # default     = "123.253.176.253"
-  nullable = false
-  validation {
-    condition     = can(regex("(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]", var.dns_update_server))
-    error_message = "Invalid input, must be a valid domain name."
-  }
+  default     = ""
+  nullable    = true
 }
 
 variable "dns_update_keyname" {
   type        = string
   description = "TSIG Key Name for RFC2136 Updates"
-  nullable    = false
+  default     = ""
+  nullable    = true
 }
 
 variable "dns_update_keyalgorithm" {
   type        = string
   description = "TSIG Algorithm for RFC2136 Updates"
-  nullable    = false
-  # default     = "hmac-sha256"
+  default     = "hmac-sha256"
+  nullable    = true
 }
 
 variable "dns_update_keysecret" {
   type        = string
   description = "TSIG Key Secret for RFC2136 Updates"
-  nullable    = false
-  # sensitive   = true
+  default     = ""
+  nullable    = true
+  sensitive   = true
 }
 variable "container_resource_cpu" {
   type        = number

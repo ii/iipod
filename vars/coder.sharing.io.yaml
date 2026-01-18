@@ -1,0 +1,17 @@
+# Variables for coder.sharing.io deployment
+coder_url: "https://coder.sharing.io"
+coder_domain: "coder.sharing.io"
+default_container_image: "ghcr.io/ii/iipod:latest"
+default_git_url: "https://github.com/ii/iipod/"
+default_org_url: "https://raw.githubusercontent.com/ii/iipod/canon/README.org"
+public_ip: "157.151.169.69"
+# DNS/PDNS - left empty, subdomain creation disabled
+pdns_api_key: ""
+pdns_api_url: ""
+dns_update_server: ""
+dns_update_keyname: ""
+dns_update_keysecret: ""
+# Resources
+container_resource_cpu: 4
+container_resource_memory: 8
+privileged: false
